@@ -37,12 +37,7 @@ export default class Level1 extends Phaser.Scene {
       if (!this.isCloned) {
         this.isCloned = true;
         this.feedbackText.setText('Success! The ancient dungeon reveals itself...');
-        this.revealDungeon();
-
-        // Transition to next level after a short delay
-        this.time.delayedCall(2000, () => {
-          this.scene.start('Level2');
-        });
+        this.scene.start("Level2");
       } else {
         this.feedbackText.setText('The dungeon is already cloned.');
       }
@@ -51,15 +46,6 @@ export default class Level1 extends Phaser.Scene {
     }
   }
 
-  revealDungeon() {
-    // Add walls, doors, chests etc.
-    this.add.image(200, 200, 'wall');
-    this.add.image(300, 200, 'wall');
-    this.add.image(400, 200, 'wall');
-    this.add.image(500, 300, 'chest');
-    // ... make the dungeon appear visually
-    this.torch.setDepth(1); // Keep torch on top if needed
-  }
 
   update() {
     // Add any real-time updates if needed
