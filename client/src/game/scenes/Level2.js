@@ -20,10 +20,44 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
     }
 
     // ... preload() ...
+    preload() {
+        this.load.image('robot', 'assets/EnemyRobot_Idle.png');
+    }
 
     create() {
         const { width, height } = this.scale;
         const centerX = width / 2;
+
+        const robotX = width * 0.5;
+        const robotY = width * 0.7;
+
+        this.robotInstruction = this.add.text(
+            robotX, 
+            robotY - 50, 
+            "Welcome, Commander, to our Hackathon Adventure!\nWASD to navigate, T to open the terminal\nWe’ve crash-landed on an uncharted planet...\nWe need to gather critical resources to survive\nLet’s checkout that mysterious tunnel ahead—it might hold the key to our escape!", 
+            {
+                fontFamily: 'Courier, monospace',
+                fontSize: '10px',
+                fill: '#00ffcc',
+                align: 'center',
+                backgroundColor: '#000000cc', // semi-transparent
+                padding: { x: 12, y: 8 },
+                wordWrap: { width: 250, useAdvancedWrap: true },
+                shadow: {
+                  offsetX: 2,
+                  offsetY: 2,
+                  color: '#000',
+                  blur: 2,
+                  stroke: false,
+                  fill: true
+                }
+            }
+          ).setOrigin(0.5);
+
+        // Spawn the robot sprite
+        this.robot = this.physics.add.sprite(robotX, robotY, 'robot');
+        this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
+        this.robot.setCollideWorldBounds(true); // Prevent the robot from leaving the game bounds (optional)
         // ... other setup ...
         this.cameras.main.setBackgroundColor('#2c3e50');
 
