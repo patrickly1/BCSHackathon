@@ -27,36 +27,44 @@ export default class Level2 extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+        this.cameras.main.setBackgroundColor("#3d3d3d"); // Dungeon floor color
 
         // Setup tilemap
         const map = this.add.tilemap("map");
-        const tiles = map.addTilesetImage("tiles", "tiles2")
-        const groundLayer = map.createLayer("Ground", tiles)
-        const wallLayer = map.createLayer("Walls", tiles)
+        const tiles = map.addTilesetImage("tiles", "tiles2");
+        const groundLayer = map.createLayer("Ground", tiles);
+        const wallLayer = map.createLayer("Walls", tiles);
 
         // --- Setup UI Text ---
-        this.add.text(250, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
-        this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
-        this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
+        this.add.text(250, 30, "Level 2: The Blacksmith’s Anvil", { fontSize: "14px", fill: "#fff" }).setOrigin(0.5);
+        this.feedbackText = this.add
+            .text(250, 100, "Collect the sword parts (WASD to move). Press T for terminal.", {
+                fontSize: "16px",
+                fill: "#aaa",
+            })
+            .setOrigin(0.5);
+        this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
+        this.stagedText = this.add.text(10, 30, "Staged: ", { fontSize: "8px", fill: "#fff" });
 
         // --- Setup Anvil ---
-        this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
+        this.anvil = this.add.image(width * 0.5, height * 0.5, "anvil").setScale(1.5); // Position the anvil centrally
 
         // --- Setup Player ---
-        this.player = this.physics.add.sprite(100, 450, 'player'); // Starting position
+        s
+        this.player = this.physics.add.sprite(240, 240, "player").setScale(2.5);
+        this.player.play("idle", true);
         this.player.setCollideWorldBounds(true); // Keep player within game bounds
         // Optional: Set player size if sprite needs adjusting
         // this.player.setSize(20, 32).setOffset(6, 16);
 
         // --- Setup Items ---
+
         this.itemsToCollect = this.physics.add.group();
 
         // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, 'sword_blade').setData('itemName', 'blade');
-        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, 'sword_hilt').setData('itemName', 'hilt');
-        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, 'gem').setData('itemName', 'gem');
+        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, "sword_blade").setData("itemName", "blade");
+        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, "sword_hilt").setData("itemName", "hilt");
+        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, "gem").setData("itemName", "gem");
 
         // --- Setup Physics ---
         // Add overlap detection between player and items
@@ -64,15 +72,15 @@ export default class Level2 extends Phaser.Scene {
 
         // --- Setup Input ---
         // Basic WASD controls
-        this.keys = this.input.keyboard.addKeys('W,A,S,D');
+        this.keys = this.input.keyboard.addKeys("W,A,S,D");
 
         // Listen for commands from the React Terminal
-        this.game.events.on('commandInput', this.handleCommand, this);
+        this.game.events.on("commandInput", this.handleCommand, this);
 
         // Cleanup listener when scene is destroyed
-        this.events.on('shutdown', () => {
-            console.log('Level 2 shutdown, removing listener.');
-            this.game.events.off('commandInput', this.handleCommand, this);
+        this.events.on("shutdown", () => {
+            console.log("Level 2 shutdown, removing listener.");
+            this.game.events.off("commandInput", this.handleCommand, this);
             // Reset state for potential restarts if needed (or handle in init/create)
             this.inventory.clear();
             this.stagedItems.clear();
@@ -90,15 +98,20 @@ export default class Level2 extends Phaser.Scene {
         // Horizontal movement
         if (this.keys.A.isDown) {
             this.player.setVelocityX(-PLAYER_SPEED);
+            this.player.setFlipX(true); // Mirror horizontally
+            this.player.anims.play("walk-right", true);
         } else if (this.keys.D.isDown) {
             this.player.setVelocityX(PLAYER_SPEED);
-        }
-
-        // Vertical movement
-        if (this.keys.W.isDown) {
+            this.player.setFlipX(false);
+            this.player.play("walk-right", true);
+        } else if (this.keys.W.isDown) {
             this.player.setVelocityY(-PLAYER_SPEED);
+            this.player.play("walk-up", true);
         } else if (this.keys.S.isDown) {
             this.player.setVelocityY(PLAYER_SPEED);
+            this.player.play("walk-down", true);
+        } else {
+            this.player.play("idle", true);
         }
 
         // Normalize speed for diagonal movement
