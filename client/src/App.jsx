@@ -229,6 +229,13 @@ function App() {
     // setIsTerminalOpen(false);
   };
 
+  // Inside App.jsx
+  useEffect(() => {
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.events.emit("terminalToggled", isTerminalOpen);
+    }
+  }, [isTerminalOpen]); // Re-run when terminal state changes
+
   return (
     <div className="App">
       {/* Container where Phaser canvas will be injected */}
