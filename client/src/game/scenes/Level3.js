@@ -54,7 +54,7 @@ export default class Level3 extends Phaser.Scene {
         this.itemsToCollect = this.physics.add.group();
 
         // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, 'sword_blade').setData('itemName', 'blade');
+        const blade = this.itemsToCollect.create(width * 0.4, height * 0.2, 'sword_blade').setData('itemName', 'blade');
         const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, 'sword_hilt').setData('itemName', 'hilt');
         const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, 'gem').setData('itemName', 'gem');
 
@@ -167,7 +167,7 @@ export default class Level3 extends Phaser.Scene {
         if (this.checkWinCondition()) {
             this.setFeedback('All parts staged! Ready to forge. Proceeding...');
             this.time.delayedCall(2500, () => {
-                this.scene.start('Level3'); // Move to the next level
+                this.scene.start('Level4'); // Move to the next level
             });
         }
     }
