@@ -25,9 +25,10 @@ function App() {
   // Handle 'T' key press to toggle terminal
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key.toUpperCase() === 'T') {
-        setIsTerminalOpen(prev => !prev);
-      }
+        const activeElement = document.activeElement;
+        if (event.key.toUpperCase() === 'T' && activeElement.tagName !== 'INPUT') {
+            setIsTerminalOpen(prev => !prev);
+        }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

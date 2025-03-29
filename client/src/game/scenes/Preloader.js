@@ -45,16 +45,16 @@ export default class Preloader extends Phaser.Scene {
     });
 
     // Load assets for all levels here
-    // this.load.image('torch', 'assets/torch.png'); // Example
-    // this.load.image('wall', 'assets/wall.png');
-    // this.load.image('chest', 'assets/chest.png');
-    // this.load.image('sword_blade', 'assets/sword_blade.png');
-    // this.load.image('sword_hilt', 'assets/sword_hilt.png');
-    // this.load.image('gem', 'assets/gem.png');
-    // this.load.image('anvil', 'assets/anvil.png');
+    this.load.image('torch', './assets/torch.png'); // Example
+    this.load.image('wall', './assets/wall.png');
+    this.load.image('chest', './assets/chest.png');
+    this.load.image('sword_blade', 'assets/sword_blade.png');
+    this.load.image('sword_hilt', 'assets/sword_hilt.png');
+    this.load.image('gem', 'assets/gem.png');
+    this.load.image('anvil', 'assets/anvil.png');
     // this.load.image('shield', 'assets/shield.png');
     // this.load.image('map', 'assets/map.png');
-    // this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
     // ... load all other assets
   }
 
