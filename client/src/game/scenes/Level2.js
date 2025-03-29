@@ -1,8 +1,8 @@
 // client/src/game/scenes/Level2.js
 import Phaser from 'phaser';
 
-const PLAYER_SPEED = 200; // Pixels per second
-const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
+const PLAYER_SPEED = 160; // Pixels per second
+const REQUIRED_BRANCH_NAME = 'secret-tunnel'; // The name players need to use
 
 export default class Level2 extends Phaser.Scene {
     constructor() {
@@ -10,88 +10,70 @@ export default class Level2 extends Phaser.Scene {
 
         // Scene state
         this.player = null;
-        this.keys = null; // To store keyboard keys
-        this.itemsToCollect = null; // Group for collectable items
-        this.anvil = null;
+        this.keys = null;
         this.feedbackText = null;
+        this.mapImage = null; // Optional visual cue
 
         // Game logic state
-        this.inventory = new Set(); // Items the player has picked up
-        this.stagedItems = new Set(); // Items successfully 'git add'-ed
+        this.branchCreated = false;
+        this.checkedOut = false;
     }
 
     preload() {
-        // Assets should already be loaded by Preloader.js
-        // If you need scene-specific assets, load them here.
+        // Assets should be loaded by Preloader.js
+        // this.load.image('map', 'assets/map.png'); // Ensure map is loaded if used
     }
 
     create() {
+        // Use relative positioning
         const { width, height } = this.scale;
-        this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+        const centerX = width / 2;
+        const centerY = height / 2;
 
-        // Setup tilemap
-        const map = this.add.tilemap("map");
-        const tiles = map.addTilesetImage("tiles", "tiles2")
-        const groundLayer = map.createLayer("Ground", tiles)
-        const wallLayer = map.createLayer("Walls", tiles)
+        this.cameras.main.setBackgroundColor('#2c3e50'); // A different dungeon area color
 
         // --- Setup UI Text ---
-        this.add.text(250, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
-        this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
-        this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
+        this.add.text(centerX, 30, 'Level 2: The Mystic Map', { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
+        this.feedbackText = this.add.text(centerX, height - 30, 'Explore... Maybe create a new path? (Press T)', { fontSize: '12px', fill: '#aaa' }).setOrigin(0.5);
 
-        // --- Setup Anvil ---
-        this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
+        // --- Optional Visual Cue (Map) ---
+        // If you have a map image, display it. It can react to commands.
+        // this.mapImage = this.add.image(centerX, centerY - 50, 'map').setScale(0.8);
 
         // --- Setup Player ---
-        this.player = this.physics.add.sprite(100, 450, 'player'); // Starting position
-        this.player.setCollideWorldBounds(true); // Keep player within game bounds
-        // Optional: Set player size if sprite needs adjusting
-        // this.player.setSize(20, 32).setOffset(6, 16);
-
-        // --- Setup Items ---
-        this.itemsToCollect = this.physics.add.group();
-
-        // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, 'sword_blade').setData('itemName', 'blade');
-        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, 'sword_hilt').setData('itemName', 'hilt');
-        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, 'gem').setData('itemName', 'gem');
-
-        // --- Setup Physics ---
-        // Add overlap detection between player and items
-        this.physics.add.overlap(this.player, this.itemsToCollect, this.collectItem, null, this);
+        this.player = this.physics.add.sprite(centerX, height - 80, 'player'); // Start near bottom-center
+        this.player.setCollideWorldBounds(true);
 
         // --- Setup Input ---
-        // Basic WASD controls
         this.keys = this.input.keyboard.addKeys('W,A,S,D');
 
-        // Listen for commands from the React Terminal
+        // Listen for commands from React Terminal
         this.game.events.on('commandInput', this.handleCommand, this);
 
-        // Cleanup listener when scene is destroyed
+        // Cleanup listener
         this.events.on('shutdown', () => {
             console.log('Level 2 shutdown, removing listener.');
             this.game.events.off('commandInput', this.handleCommand, this);
-            // Reset state for potential restarts if needed (or handle in init/create)
-            this.inventory.clear();
-            this.stagedItems.clear();
+            // Reset state for potential restarts
+            this.branchCreated = false;
+            this.checkedOut = false;
         });
 
-        // Initial state update
-        this.updateStatusText();
+        this.setFeedback(`Hint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
     }
 
     update(time, delta) {
-        if (!this.player || !this.keys) return; // Guard clause
+        if (!this.player || !this.keys) return;
 
         this.player.setVelocity(0);
 
         // Horizontal movement
         if (this.keys.A.isDown) {
             this.player.setVelocityX(-PLAYER_SPEED);
+            this.player.flipX = true; // Face left
         } else if (this.keys.D.isDown) {
             this.player.setVelocityX(PLAYER_SPEED);
+            this.player.flipX = false; // Face right
         }
 
         // Vertical movement
@@ -101,102 +83,98 @@ export default class Level2 extends Phaser.Scene {
             this.player.setVelocityY(PLAYER_SPEED);
         }
 
-        // Normalize speed for diagonal movement
+        // Normalize speed
         this.player.body.velocity.normalize().scale(PLAYER_SPEED);
-
-        // --- Add simple player direction facing (optional) ---
-        // if (this.keys.A.isDown) this.player.flipX = true;
-        // if (this.keys.D.isDown) this.player.flipX = false;
-    }
-
-    collectItem(player, item) {
-        const itemName = item.getData('itemName');
-        if (!this.inventory.has(itemName)) {
-            this.inventory.add(itemName);
-            console.log(`Collected: ${itemName}`);
-            this.setFeedback(`Collected ${itemName}! Find the others.`);
-
-            // Remove item from the scene
-            item.disableBody(true, true);
-
-            this.updateStatusText();
-        }
     }
 
     handleCommand(command) {
-        if (!this.scene.isActive()) {
-            return; // Don't process if scene is not active
+        if (!this.scene.isActive() || this.checkedOut) {
+             if(this.checkedOut) {
+                this.setFeedback("You've already found the secret passage!");
+             }
+            return; // Don't process if scene inactive or level already passed
         }
         console.log(`Level 2 received command: ${command}`);
 
-        const parts = command.trim().toLowerCase().split(' '); // Split command into parts
+        const parts = command.trim().toLowerCase().split(' ');
         const action = parts[0];
         const verb = parts[1];
-        const target = parts[2]; // The item name
+        const arg = parts[2]; // Branch name
 
-        if (action !== 'git' || verb !== 'add' || !target) {
-            this.setFeedback(`Invalid command format. Use: git add <item_name>`);
-            return;
+        // --- Handle 'git branch' ---
+        if (action === 'git' && verb === 'branch') {
+            if (parts.length === 3) { // Expecting 'git branch <name>'
+                if (arg === REQUIRED_BRANCH_NAME) {
+                    if (!this.branchCreated) {
+                        this.branchCreated = true;
+                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' created! Now switch to it.`);
+                        console.log('Branch created successfully');
+                        // Optional visual feedback: make map glow?
+                        // if (this.mapImage) this.mapImage.setTint(0xffff00);
+                    } else {
+                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`);
+                    }
+                } else {
+                    this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`);
+                }
+            } else {
+                 this.setFeedback(`Usage: git branch <branch-name>`);
+            }
+            return; // Command processed (or failed validation)
         }
 
-        // Check if the target item is one of the required ones
-        if (!REQUIRED_ITEMS.includes(target)) {
-            this.setFeedback(`Cannot add '${target}'. It's not part of the sword.`);
-            return;
+        // --- Handle 'git checkout' ---
+        if (action === 'git' && verb === 'checkout') {
+            if (parts.length === 3) { // Expecting 'git checkout <name>'
+                 if (arg === REQUIRED_BRANCH_NAME) {
+                    if (this.branchCreated) {
+                        if (!this.checkedOut) {
+                            // --- SUCCESS ---
+                            this.checkedOut = true;
+                            this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
+                            console.log('Checkout successful!');
+                            this.revealPassage(); // Trigger visual change
+
+                            // Transition to next level
+                            this.time.delayedCall(2500, () => {
+                                this.scene.start('Level3'); // <<<< CHANGE TO YOUR NEXT LEVEL KEY
+                            });
+                        } else {
+                             // Should technically be blocked by the check at the start of the function
+                             this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`);
+                        }
+                    } else {
+                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`);
+                    }
+                } else {
+                    this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`);
+                }
+            } else {
+                 this.setFeedback(`Usage: git checkout <branch-name>`);
+            }
+            return; // Command processed
         }
 
-        // Check if the player has collected the item
-        if (!this.inventory.has(target)) {
-            this.setFeedback(`You haven't collected the ${target} yet!`);
-            return;
-        }
-
-        // Check if the item has already been staged
-        if (this.stagedItems.has(target)) {
-            this.setFeedback(`The ${target} is already on the anvil (staged).`);
-            return;
-        }
-
-        // --- Success: Stage the item ---
-        this.stagedItems.add(target);
-        this.setFeedback(`Success! Added ${target} to the anvil.`);
-        console.log(`Staged: ${target}`);
-        this.updateStatusText();
-
-        // --- Check for Win Condition ---
-        if (this.checkWinCondition()) {
-            this.setFeedback('All parts staged! Ready to forge. Proceeding...');
-            this.time.delayedCall(2500, () => {
-                this.scene.start('Level3'); // Move to the next level
-            });
-        }
+        // --- Fallback for unknown commands ---
+        this.setFeedback(`Unknown command. Try 'git branch ${REQUIRED_BRANCH_NAME}' or 'git checkout ${REQUIRED_BRANCH_NAME}'`);
     }
 
-    checkWinCondition() {
-        // Check if the number of staged items matches the required number
-        if (this.stagedItems.size !== REQUIRED_ITEMS.length) {
-            return false;
-        }
-        // Optionally, double-check if *all* required items are present
-        return REQUIRED_ITEMS.every(item => this.stagedItems.has(item));
+    revealPassage() {
+        // Simple visual feedback: change background slightly
+        this.cameras.main.setBackgroundColor('#34495e'); // Darker shade maybe
+        this.add.text(this.scale.width / 2, this.scale.height / 2, 'Passage Opened!', { fontSize: '20px', fill: '#0f0' }).setOrigin(0.5);
+
+        // Stop player movement maybe?
+        // this.player.setVelocity(0);
+        // this.player.setActive(false);
+
+        // If using map, maybe change its tint or image
+        // if (this.mapImage) this.mapImage.setTint(0x00ff00).setScale(0.9); // Green tint
     }
 
     setFeedback(message) {
-        this.feedbackText.setText(message);
-        // Optional: Clear feedback after a delay
-        // if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-        // this.feedbackTimeout = setTimeout(() => {
-        //     if (this.feedbackText.active) { // Check if text object still exists
-        //       this.feedbackText.setText('Use terminal (T) to "git add <item_name>"');
-        //     }
-        // }, 4000);
-    }
-
-    updateStatusText() {
-         // Use Array.from() to convert Set to Array for joining
-         const collectedList = Array.from(this.inventory).join(', ') || 'None';
-         const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-         this.collectedText.setText(`Collected: ${collectedList}`);
-         this.stagedText.setText(`Staged: ${stagedList}`);
+         if (this.feedbackText && this.feedbackText.active) {
+             this.feedbackText.setText(message);
+         }
     }
 }
