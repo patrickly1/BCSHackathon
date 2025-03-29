@@ -47,6 +47,34 @@ function App() {
     // setIsTerminalOpen(false);
   };
 
+  const handleSave = async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: 'devhero',
+          timeElapsed: 42,
+          levelsCompleted: ['level1'],
+        }),
+      });
+      const data = await res.json();
+      console.log('✅ Save response:', data);
+    } catch (err) {
+      console.error('❌ Save failed:', err);
+    }
+  };
+
+  const handleLoad = async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/save/devhero');
+      const data = await res.json();
+      console.log('📦 Loaded save:', data);
+    } catch (err) {
+      console.error('❌ Load failed:', err);
+    }
+  };
+
   return (
     <div className="App">
       {/* Container where Phaser canvas will be injected */}
@@ -55,6 +83,14 @@ function App() {
       {isTerminalOpen && (
         <Terminal onSubmit={handleCommandSubmit} />
       )}
+            <div style={{ position: 'absolute', bottom: 20, left: 20 }}>
+        <button onClick={handleSave} style={{ marginRight: '10px' }}>
+          💾 Save
+        </button>
+        <button onClick={handleLoad}>
+          📂 Load
+        </button>
+      </div>
     </div>
   );
 }
