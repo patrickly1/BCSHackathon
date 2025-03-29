@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import GameManager from '../GameManager';
 
 export default class Preloader extends Phaser.Scene {
   constructor() {
@@ -63,8 +64,8 @@ export default class Preloader extends Phaser.Scene {
   }
 
   create() {
-    // Assets loaded, start the first level
-    console.log("Preloader complete. Starting Level 1.");
-    this.scene.start('Level1'); // <<<< START YOUR FIRST LEVEL HERE
+    const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
+    console.log(`Preloader complete. Starting ${savedLocation}.`);
+    this.scene.start(savedLocation);
   }
 }

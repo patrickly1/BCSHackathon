@@ -142,6 +142,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Terminal from './components/Terminal'; // Make sure path is correct
 import { initGame } from './game/game';     // Make sure path is correct & it returns the Phaser game instance
+import GameManager from './game/GameManager';
 // If you define config in game.js, you might not need a separate config import here
 // import { config as phaserConfig } from './game/config'; // Or get config differently
 import Phaser from 'phaser';                // Import Phaser
@@ -153,7 +154,7 @@ function App() {
   const [phaserGame, setPhaserGame] = useState(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
-  const [levelsCompleted, setLevelsCompleted] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState('Level1');
   
   const phaserContainerRef = useRef(null); // Ref to mount Phaser game
 
@@ -172,7 +173,9 @@ function App() {
 
       // Initialize the game using your initGame function
       // Make sure initGame takes the container element and returns the Phaser.Game instance
-      const game = initGame(phaserContainerRef.current);
+      const game = initGame(phaserContainerRef.current, {
+        setCurrentLocation
+      });
 
       // --- Important: Check if initGame successfully returned a game instance ---
       if (game && game instanceof Phaser.Game) {
@@ -261,10 +264,11 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: saveName,
-          timeElapsed,
-          levelsCompleted: ['none'], // placeholder
-        }), // this is a JSON object of all the parameters
+            username: saveName,
+            timeElapsed,
+            currentLocation: GameManager.getPlayer().getLocation(),
+            inventory: GameManager.getPlayer().inventory
+          }),
       });
   
       const data = await res.json();
@@ -272,7 +276,7 @@ function App() {
       console.log('✅ Save response:', data);
   
       setTimeElapsed(data.timeElapsed);
-      setLevelsCompleted(data.levelsCompleted);
+      setCurrentLocation(data.currentLocation);
       // just for syncing purposes.
       // data. means the parsed response from the backend, Mongoose
 
@@ -322,8 +326,24 @@ function App() {
       console.log('📦 Loaded save:', data);
       setUsername(selected);
       setTimeElapsed(data.timeElapsed);
-      setLevelsCompleted(data.levelsCompleted);
+      setCurrentLocation(data.currentLocation);
       setTimerActive(true);
+      // 4. Destroy existing Phaser game if it exists
+    if (gameInstanceRef.current) {
+        console.log("Destroying previous game before loading saved state...");
+        gameInstanceRef.current.destroy(true);
+        gameInstanceRef.current = null;
+    }
+    
+    // 5. Start a new game with the loaded player data
+    const game = initGame(phaserContainerRef.current, {
+        setCurrentLocation,
+        initialPlayerData: {
+        location: data.currentLocation,
+        inventory: data.inventory || {}
+        }
+    });
+    gameInstanceRef.current = game;
     } catch (err) {
       console.error('❌ Load failed:', err);
     }
@@ -372,21 +392,33 @@ function App() {
             📂 Load
         </button>
         </div>
-                <div style={{ // this entire section is fixed to the top right and it's the data loaded
+        <div style={{
         position: 'fixed',
         top: 10,
         right: 10,
         zIndex: 9999,
         fontSize: '10px',
-        opacity: 0.8,
-        textAlign: 'right',
+        opacity: 0.9,
+        textAlign: 'left',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        padding: '4px 6px',
-        borderRadius: '4px'
+        padding: '6px 8px',
+        borderRadius: '4px',
+        width: '120px', // fixed width
+        wordWrap: 'break-word',
+        overflowWrap: 'break-word'
         }}>
         <div><strong>User:</strong> {username || '—'}</div>
         <div><strong>Time:</strong> {timeElapsed}s</div>
-        <div><strong>Levels:</strong> {levelsCompleted.join(', ') || '—'}</div>
+        <div><strong>Location:</strong> {currentLocation || '—'}</div>
+        <div><strong>Inventory:</strong></div>
+        {Object.entries(GameManager.getPlayer().inventory).map(([location, items]) => (
+            <div key={location}>
+            <strong>{location}:</strong>{' '}
+            <span style={{ display: 'inline-block', wordBreak: 'break-word' }}>
+                {items.join(', ') || '—'}
+            </span>
+            </div>
+        ))}
         </div>
       {/* Container where Phaser canvas will be injected */}
       <div ref={phaserContainerRef} id="phaser-container"></div>
