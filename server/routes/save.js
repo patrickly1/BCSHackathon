@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const Save = require('../models/save');
+const Save = require('../models/Save');
 
 // this saves a user.
 router.post('/', async (req, res) => {
-  const { username, timeElapsed, levelsCompleted } = req.body;
+    const { username, timeElapsed, currentLocation, inventory } = req.body;
 
   try {
     const save = await Save.findOneAndUpdate(
       { username },
-      { timeElapsed, levelsCompleted },
+      { timeElapsed, currentLocation, inventory },
       { upsert: true, new: true }
     );
     res.json(save);
