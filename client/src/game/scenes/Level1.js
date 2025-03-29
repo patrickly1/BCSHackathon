@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
 
+
+
 export default class Level1 extends Phaser.Scene {
   constructor() {
     super('Level1');
@@ -10,6 +12,7 @@ export default class Level1 extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor('#1a1a1a'); // Dark background
     GameManager.getPlayer().setLocation('Level1');
+    // sets the location of the player to level1
 
     // Initial state: Shadowy void with a torch
     // this.torch = this.add.image(100, 100, 'torch').setScale(0.5); // Example position/asset

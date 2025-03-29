@@ -143,7 +143,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Terminal from './components/Terminal'; // Make sure path is correct
 import { initGame } from './game/game';     // Make sure path is correct & it returns the Phaser game instance
 import GameManager from './game/GameManager';
-// If you define config in game.js, you might not need a separate config import here
+// imports GameManager
 // import { config as phaserConfig } from './game/config'; // Or get config differently
 import Phaser from 'phaser';                // Import Phaser
 // import './index.css';
@@ -343,6 +343,8 @@ function App() {
         inventory: data.inventory || {}
         }
     });
+
+    
     gameInstanceRef.current = game;
     } catch (err) {
       console.error('❌ Load failed:', err);

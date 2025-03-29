@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
 
+// uses GameManager to load in a specific level.
+
 export default class Preloader extends Phaser.Scene {
   constructor() {
     super('Preloader');

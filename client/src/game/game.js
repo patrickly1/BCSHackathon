@@ -11,7 +11,9 @@ export function initGame(container, options = {}) {
   
     // Set starting location
     const playerData = options.initialPlayerData || {};
+    // sets starting location.
     GameManager.getPlayer().loadFromData(playerData);
+    // loads the current player
   
     // If a saved location exists, use it
     const startingScene = GameManager.getPlayer().getLocation() || 'Level1';

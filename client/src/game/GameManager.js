@@ -1,5 +1,7 @@
 import Player from './player';
 
+// ensures that there is only one player across all scenes.
+
 class GameManager {
   constructor() {
     this.player = new Player();

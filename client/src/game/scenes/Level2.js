@@ -30,6 +30,7 @@ export default class Level2 extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
         GameManager.getPlayer().setLocation('Level2');
+        // sets location of player to level2
 
         if (this.game.reactSetCurrentLocation) {
             this.game.reactSetCurrentLocation('Level2');
