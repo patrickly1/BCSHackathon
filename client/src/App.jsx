@@ -20,7 +20,7 @@ function App() {
       phaserGame?.destroy(true);
       setPhaserGame(null);
     };
-  }, [phaserGame]); // Only re-run if phaserGame changes (e.g., on cleanup)
+  }, []); // Only re-run if phaserGame changes (e.g., on cleanup)
 
   // Handle 'T' key press to toggle terminal
   useEffect(() => {
