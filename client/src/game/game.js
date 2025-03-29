@@ -1,9 +1,25 @@
 import Phaser from 'phaser';
+import GameManager from './GameManager';
 import { config } from './config';
 
-export function initGame(container) {
-  // Ensure config parent matches the container ref's ID or the container itself
-  const gameConfig = { ...config, parent: container };
-  const game = new Phaser.Game(gameConfig);
-  return game;
-}
+export function initGame(container, options = {}) {
+    const gameConfig = { ...config, parent: container };
+    const game = new Phaser.Game(gameConfig);
+  
+    // Attach React setter
+    game.reactSetCurrentLocation = options.setCurrentLocation || (() => {});
+  
+    // Set starting location
+    const playerData = options.initialPlayerData || {};
+    // sets starting location.
+    GameManager.getPlayer().loadFromData(playerData);
+    // loads the current player
+  
+    // If a saved location exists, use it
+    const startingScene = GameManager.getPlayer().getLocation() || 'Level1';
+  
+    // Wait for the game to be ready before switching
+    game.scene.start(startingScene);
+  
+    return game;
+  }
