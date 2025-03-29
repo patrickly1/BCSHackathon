@@ -10,8 +10,8 @@ import Level2 from './scenes/Level2';
 export const config = {
   type: Phaser.AUTO, // AUTO uses WebGL if available, otherwise Canvas
   parent: 'phaser-container', // ID of the div to inject the canvas into
-  width: 960,
-  height: 960,
+  width: 480,
+  height: 480,
   physics: {
     default: 'arcade',
     arcade: {
