@@ -29,8 +29,8 @@ export default class Level2 extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
         const { width, height } = this.scale;
         // --- Setup UI Text ---
-        this.add.text(250, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
+        this.add.text(width * 0.5, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
+        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '8px', fill: '#aaa' }).setOrigin(0.5);
         this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
         this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
 
