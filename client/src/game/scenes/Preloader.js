@@ -56,6 +56,10 @@ export default class Preloader extends Phaser.Scene {
     // this.load.image('map', 'assets/map.png');
     this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
     // ... load all other assets
+
+    // Tilemap
+    this.load.image("tiles2", 'assets/level/tiles.png')
+    this.load.tilemapTiledJSON("map", 'assets/level/tilemap.tmj')
   }
 
   create() {
