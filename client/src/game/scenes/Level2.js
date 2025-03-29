@@ -50,7 +50,6 @@ export default class Level2 extends Phaser.Scene {
         this.anvil = this.add.image(width * 0.5, height * 0.5, "anvil").setScale(1.5); // Position the anvil centrally
 
         // --- Setup Player ---
-        s
         this.player = this.physics.add.sprite(240, 240, "player").setScale(2.5);
         this.player.play("idle", true);
         this.player.setCollideWorldBounds(true); // Keep player within game bounds
