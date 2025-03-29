@@ -206,6 +206,7 @@ function App() {
       const isInputFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
 
       if (event.key.toUpperCase() === 'T' && !event.repeat && !isInputFocused) {
+        event.preventDefault();
         setIsTerminalOpen(prev => !prev);
       }
     };
