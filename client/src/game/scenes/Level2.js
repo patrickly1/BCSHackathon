@@ -1,7 +1,7 @@
 // client/src/game/scenes/Level2.js
 import Phaser from 'phaser';
 
-const PLAYER_SPEED = 160; // Pixels per second
+const PLAYER_SPEED = 200; // Pixels per second
 const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
 
 export default class Level2 extends Phaser.Scene {
@@ -27,6 +27,7 @@ export default class Level2 extends Phaser.Scene {
 
     create() {
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+<<<<<<< HEAD
 
         // Setup tilemap
         const map = this.add.tilemap("map");
@@ -34,14 +35,17 @@ export default class Level2 extends Phaser.Scene {
         const groundLayer = map.createLayer("Ground", tiles)
         const wallLayer = map.createLayer("Walls", tiles)
 
+=======
+        const { width, height } = this.scale;
+>>>>>>> e4bf6eba5e33b88b2bc443ed11b71c077653bbf4
         // --- Setup UI Text ---
-        this.add.text(400, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(400, 570, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
-        this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '14px', fill: '#fff' });
-        this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '14px', fill: '#fff' });
+        this.add.text(250, 30, 'Level 2: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
+        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
+        this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
+        this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
 
         // --- Setup Anvil ---
-        this.anvil = this.add.image(400, 300, 'anvil').setScale(1.5); // Position the anvil centrally
+        this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
 
         // --- Setup Player ---
         this.player = this.physics.add.sprite(100, 450, 'player'); // Starting position
@@ -53,9 +57,9 @@ export default class Level2 extends Phaser.Scene {
         this.itemsToCollect = this.physics.add.group();
 
         // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(650, 100, 'sword_blade').setData('itemName', 'blade');
-        const hilt = this.itemsToCollect.create(150, 120, 'sword_hilt').setData('itemName', 'hilt');
-        const gem = this.itemsToCollect.create(500, 450, 'gem').setData('itemName', 'gem');
+        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, 'sword_blade').setData('itemName', 'blade');
+        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, 'sword_hilt').setData('itemName', 'hilt');
+        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, 'gem').setData('itemName', 'gem');
 
         // --- Setup Physics ---
         // Add overlap detection between player and items
