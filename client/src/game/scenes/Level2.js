@@ -26,6 +26,7 @@ export default class Level2 extends Phaser.Scene {
     }
 
     create() {
+        const { width, height } = this.scale;
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
 
         // Setup tilemap
