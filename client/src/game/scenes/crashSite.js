@@ -6,7 +6,7 @@ const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
 
 export default class Level2 extends Phaser.Scene {
     constructor() {
-        super('Level2');
+        super('crashSite');
 
         // Scene state
         this.player = null;
@@ -35,7 +35,7 @@ export default class Level2 extends Phaser.Scene {
         this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
 
         // --- Setup Anvil ---
-        this.anvil = this.add.image(width * 0.5, hweight * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
+        this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
 
         // --- Setup Player ---
         this.player = this.physics.add.sprite(100, 450, 'player'); // Starting position

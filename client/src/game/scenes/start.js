@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 
 export default class Level1 extends Phaser.Scene {
   constructor() {
-    super('Level1');
+    super('start');
     this.isCloned = false; // State for this level
   }
 
@@ -37,7 +37,7 @@ export default class Level1 extends Phaser.Scene {
       if (!this.isCloned) {
         this.isCloned = true;
         this.feedbackText.setText('Success! The ancient dungeon reveals itself...');
-        this.scene.start("Level2");
+        this.scene.start("crashSite");
       } else {
         this.feedbackText.setText('The dungeon is already cloned.');
       }

@@ -61,6 +61,6 @@ export default class Preloader extends Phaser.Scene {
   create() {
     // Assets loaded, start the first level
     console.log("Preloader complete. Starting Level 1.");
-    this.scene.start('Level1'); // <<<< START YOUR FIRST LEVEL HERE
+    this.scene.start('start'); // <<<< START YOUR FIRST LEVEL HERE
   }
 }
