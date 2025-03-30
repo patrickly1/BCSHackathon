@@ -412,7 +412,14 @@ export default class Level4 extends Phaser.Scene {
         }
         if (!this.resetDone) {
           this.resetDone = true;
-          this.add.image(width * 0.5, height * 0.2, "spaceship")
+          this.portal = this.physics.add.sprite(width * 0.5, height * 0.2, "portal").setScale(1.5);
+          this.portal.anims.play("portal-effect");
+          this.portal.setOrigin(0.5); // Center the sprite's origin (optional)
+          this.time.delayedCall(1500, () => {
+            // Transition to a final scene or restart the game.
+            this.portal.destroy(true);
+            this.add.image(width * 0.5, height * 0.2, "spaceship")
+          });
           this.setFeedback("Reset successful! Finalize your mission with: git push");
         } else {
           this.setFeedback("You've already resolved the merge conflict. Now push your changes.");
@@ -427,9 +434,9 @@ export default class Level4 extends Phaser.Scene {
         }
         // End the game with a success message.
         this.setFeedback("Mission accomplished! Your changes have been pushed. Game Over.");
-        this.time.delayedCall(2000, () => {
+        this.time.delayedCall(500, () => {
           // Transition to a final scene or restart the game.
-          this.scene.start('EndScene'); // Replace 'EndScene' with your final scene key.
+          this.scene.start('Level5'); // Replace 'EndScene' with your final scene key.
         });
         return;
       }

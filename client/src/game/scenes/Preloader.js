@@ -77,6 +77,7 @@ export default class Preloader extends Phaser.Scene {
     // Tilemap (level4)
     this.load.image("baseTiles", 'assets/level/base/tiles.png')
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
+    this.load.spritesheet("portal", "assets/level/base/portal.png", { frameWidth: 64, frameHeight: 64 });
 
     // Assets for level5
     this.load.spritesheet("fire_anim", "assets/level/level5/fire_anim.png", { frameWidth: 24, frameHeight: 32 });
@@ -136,7 +137,13 @@ export default class Preloader extends Phaser.Scene {
         frameRate: 15, // 4 frames per second
         repeat: -1, // loop forever
     });
+    this.anims.create({
+        key: "portal-effect",
+        frames: this.anims.generateFrameNumbers("portal", { start: 0, end: 6 }),
+        frameRate: 15, // 4 frames per second
+        repeat: -1, // loop forever
+    });
 
-      this.scene.start("Level0"); //Start first level
+      this.scene.start("Level4"); //Start first level
   }
 }
