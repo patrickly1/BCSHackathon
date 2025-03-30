@@ -102,7 +102,7 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
             this.game.reactSetCurrentLocation('Level2');
           }
           
-        this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+        // this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
 
         // Setup tilemap
         const map = this.add.tilemap("map");
@@ -211,7 +211,7 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
                     if (!this.checkedOut) {
                         this.checkedOut = true;
                         this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
-                        this.revealPassage();
+                        // this.revealPassage();
                         this.time.delayedCall(2500, () => {
                             this.scene.start('Level3'); // Update as needed
                         });
