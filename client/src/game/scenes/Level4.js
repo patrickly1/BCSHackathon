@@ -62,13 +62,13 @@ export default class Level4 extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Create feedback text for command responses
-    this.feedbackText = this.add.text(centerX, height - 30, "", {
+    this.feedbackText = this.add.text(centerX, height - (height * 0.15), "", {
       fontSize: "12px",
       fill: "#fff",
     }).setOrigin(0.5);
 
     // Create instruction text that is always visible.
-    this.instructionText = this.add.text(centerX, height - 60, "Stash your progress before anything bad happens", {
+    this.instructionText = this.add.text(centerX, height - (height * 0.2), "Stash your progress before anything bad happens", {
       fontSize: "12px",
       fill: "#fff",
       fontFamily: "Minecraft"
@@ -96,7 +96,7 @@ export default class Level4 extends Phaser.Scene {
     this.input.keyboard.enabled = true;
 
     const robotX = width * 0.3;
-    const robotY = width * 0.75;
+    const robotY = height * 0.7;
 
     this.robotInstruction = this.add.text(
       robotX,
@@ -261,7 +261,7 @@ export default class Level4 extends Phaser.Scene {
         return;
       }
     }
-    this.setFeedback("Unknown command. Try: 'git stash', 'git merge mine', 'git reset', or 'git push'.");
+    this.setFeedback("Unknown command. Try: 'git stash', 'git merge mine',\n'git reset', or 'git push'.");
   }
 
   setFeedback(message) {

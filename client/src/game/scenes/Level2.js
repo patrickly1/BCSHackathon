@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import GameManager from "../GameManager";
 import PlayerController from "../PlayerController";
-import MarkupText from 'phaser3-rex-plugins/plugins/markuptext.js';
+
 
 const PLAYER_SPEED = 160;
 const REQUIRED_BRANCH_NAME = "mine";
