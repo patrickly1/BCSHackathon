@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import '../styles/Terminal.css'; // Add styles for the terminal overlay
+// import '../styles/Terminal.css'; // Add styles for the terminal overlay
 
 function Terminal({ onSubmit }) {
   const [inputValue, setInputValue] = useState('');
