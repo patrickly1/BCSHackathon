@@ -410,6 +410,9 @@ export default class Level4 extends Phaser.Scene {
     this.stashDone = false;      // Items from the mine have been stashed
     this.mergeAttempted = false; // Merge was attempted (and produced an error)
     this.resetDone = false;      // Merge conflict was resolved via reset
+
+    this.flashEvent = null;
+    this.isFlashing = false;
   }
 
   preload() {
@@ -445,6 +448,12 @@ export default class Level4 extends Phaser.Scene {
     const wallLayer = map.createLayer("Walls", mainTiles);
     const decorationLayer = map.createLayer("decorations", decorationTiles);
     const computerLayer = map.createLayer("computer", computerTile);
+
+    // Create a full-screen transparent red overlay (initially hidden)
+    this.alertOverlay = this.add.rectangle(0, 0, width, height, 0xff0000, 0.3)
+    .setOrigin(0)
+    .setDepth(100) // Ensure it’s above all tilemap layers
+    .setVisible(false);
 
     // Title text
     this.add.text(centerX, 30, "Branch 4: The Base", {
@@ -620,6 +629,7 @@ export default class Level4 extends Phaser.Scene {
         }
         if (!this.mergeAttempted) {
           this.mergeAttempted = true;
+          this.startFlashingBackground();
           this.setFeedback("Merge conflict error! Please run git reset to resolve conflicts.");
           this.instructionText.setText("Computer malfunctioned! Reset the changes!");
         } else {
@@ -635,6 +645,7 @@ export default class Level4 extends Phaser.Scene {
         }
         if (!this.resetDone) {
           this.resetDone = true;
+          this.stopFlashingBackground();
           // Create a portal sprite at launch area, then replace it with the spaceship image
           this.portal = this.physics.add.sprite(width * 0.5, height * 0.2, "portal").setScale(1.5);
           if (this.portal.anims) {
@@ -672,5 +683,30 @@ export default class Level4 extends Phaser.Scene {
     if (this.feedbackText) {
       this.feedbackText.setText(message);
     }
+  }
+
+  startFlashingBackground() {
+    if (this.flashEvent) return;
+  
+    this.flashEvent = this.time.addEvent({
+      delay: 2000,
+      loop: true,
+      callback: () => {
+        if (!this.alertOverlay) return;
+        this.isFlashing = !this.isFlashing;
+        this.alertOverlay.setVisible(this.isFlashing);
+      }
+    });
+  }
+  
+  stopFlashingBackground() {
+    if (this.flashEvent) {
+      this.flashEvent.remove();
+      this.flashEvent = null;
+    }
+    if (this.alertOverlay) {
+      this.alertOverlay.setVisible(false);
+    }
+    this.isFlashing = false;
   }
 }
