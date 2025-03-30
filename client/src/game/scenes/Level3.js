@@ -30,10 +30,14 @@ export default class Level3 extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
 
         // Setup tilemap
-        const map = this.add.tilemap("map");
-        const tiles = map.addTilesetImage("tiles", "tiles2")
-        const groundLayer = map.createLayer("Ground", tiles)
-        const wallLayer = map.createLayer("Walls", tiles)
+        const map = this.add.tilemap("levelThreeMap");
+        const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles")
+        const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles")
+        const backBackgroundLayer = map.createLayer("BackBackground", mainTiles)
+        const backgroundLayer = map.createLayer("Background", mainTiles)
+        const floorLayer = map.createLayer("Floor", mainTiles)
+        const obstacleLayer = map.createLayer("Obstacles", decorativeTiles)
+        const mushroomLayer = map.createLayer("Foliage", decorativeTiles)
 
         // --- Setup UI Text ---
         this.add.text(250, 30, 'Level 3: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
@@ -61,6 +65,12 @@ export default class Level3 extends Phaser.Scene {
         // --- Setup Physics ---
         // Add overlap detection between player and items
         this.physics.add.overlap(this.player, this.itemsToCollect, this.collectItem, null, this);
+
+
+        // --- Setup Collision ---
+        // Add collisions
+        obstacleLayer.setCollisionByProperty({ collides: true });
+        this.physics.add.collider(this.player, obstacleLayer);
 
         // --- Setup Input ---
         // Basic WASD controls
