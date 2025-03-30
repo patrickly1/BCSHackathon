@@ -70,6 +70,10 @@ export default class Level3 extends Phaser.Scene {
 
       // --- Setup UI Text ---
       // Instruction text: initially "Collect resources"
+    // --- UI Text ---
+    this.add
+    .text(width/2, 30, "Branch 3: The Mine", { fontSize: "16px", fontFamily: "Minecraft", fill: "#fff" })
+    .setOrigin(0.5); // Adjust title
       this.instructionText = this.add
           .text(width / 2, height - 90, "Collect iron and copper to craft", {
               fontSize: "12px",
