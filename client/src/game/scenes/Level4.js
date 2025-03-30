@@ -33,13 +33,18 @@ export default class Level4 extends Phaser.Scene {
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj');
 
     this.robotSound = this.sound.add("robot");
+
     this.spawnShipSound = this.sound.add("spawn-ship");
     this.shipTakeoff = this.sound.add("ship-sounds");
     this.alarmSound = this.sound.add("alarm");
 
+    this.robotSound = this.sound.add("robot");
+    this.warpSound = this.sound.add("level-delay-sound");
+
   }
 
   create() {
+    this.warpSound.play();
     const player = GameManager.getPlayer();
     if (player.getLocation() !== "Level4") {
       player.setLocation("Level4");

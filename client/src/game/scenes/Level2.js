@@ -34,10 +34,13 @@ export default class Level2 extends Phaser.Scene {
         this.load.image('level2_bg',"assets/level/crashsite/level2_bg.png");
 
         this.robotSound = this.sound.add("robot");
+        this.robotSound = this.sound.add("robot");
+        this.warpSound = this.sound.add("level-delay-sound");
     }
 
     create() {
         const { width, height } = this.scale;
+        this.warpSound.play();
         this.add.image(width / 2, height / 2, "level2_bg");
         const player = GameManager.getPlayer();
         if (player.getLocation() !== "Level2") {
@@ -276,9 +279,7 @@ export default class Level2 extends Phaser.Scene {
                         this.checkedOut = true;
                         this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Prepare for landing!`);
                         // this.revealPassage();
-                        this.time.delayedCall(2500, () => {
-                            this.scene.start("Level3"); // Update as needed
-                        });
+                        this.scene.start("Level3");
                     } else {
                         this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`);
                     }
