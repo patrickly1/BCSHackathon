@@ -28,11 +28,23 @@ export default class Level2 extends Phaser.Scene {
     }
 
     create() {
+
+        const player = GameManager.getPlayer();
+
         const { width, height } = this.scale;
         const centerX = width / 2;
 
         const robotX = width * 0.5;
         const robotY = width * 0.7;
+      
+       if (player.getLocation() !== 'Level2') {
+            player.setLocation('Level2');
+            }
+
+        // Update the location in the App (React side)
+        if (this.game.reactSetCurrentLocation) {
+            this.game.reactSetCurrentLocation('Level2');
+        }
 
         this.robotInstruction = this.add
             .text(
@@ -149,9 +161,11 @@ export default class Level2 extends Phaser.Scene {
     }
 
     collectItem(playerSprite, item) {
-        const itemName = item.getData("itemName");
-        const player = GameManager.getPlayer();
-        const currentItems = player.getInventory();
+      
+    const itemName = item.getData('itemName');
+    const player = GameManager.getPlayer();
+    player.setLocation('Level2');
+    const currentItems = player.getInventory();
 
         if (!currentItems.includes(itemName)) {
             player.addItem(itemName);

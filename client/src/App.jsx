@@ -293,6 +293,10 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    console.log("Current location updated to:", currentLocation);
+  }, [currentLocation]);
+
   const handleLoad = async () => {
     try {
       // 1. Fetch all usernames from the backend
@@ -342,6 +346,7 @@ function App() {
         gameInstanceRef.current.destroy(true);
         gameInstanceRef.current = null;
     }
+
     
     // 5. Start a new game with the loaded player data
     const game = initGame(phaserContainerRef.current, {

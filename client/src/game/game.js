@@ -18,8 +18,11 @@ export function initGame(container, options = {}) {
     // If a saved location exists, use it
     const startingScene = GameManager.getPlayer().getLocation() || 'Level1';
   
-    // Wait for the game to be ready before switching
+    // Wait for the game to be ready before switchin
+
+
     game.scene.start(startingScene);
+
   
     return game;
   }

@@ -1,22 +1,26 @@
 import Phaser from 'phaser';
+import GameManager from '../GameManager';
 import PlayerController from '../PlayerController';
 
 const PLAYER_SPEED = 200; // Pixels per second
 const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
+const player = GameManager.getPlayer();
 
 export default class Level3 extends Phaser.Scene {
     constructor() {
         super('Level3');
 
         // Scene state
-        this.player = null;
+        this.player = GameManager.getPlayer();
         this.keys = null; // To store keyboard keys
         this.itemsToCollect = null; // Group for collectable items
         this.anvil = null;
         this.feedbackText = null;
+        console.log(`inital test: ${player.getLocation()}`);
+
 
         // Game logic state
-        this.inventory = new Set(); // Items the player has picked up
+        // this.inventory = new Set(); // Items the player has picked up
         this.stagedItems = new Set(); // Items successfully 'git add'-ed
     }
 
@@ -26,10 +30,28 @@ export default class Level3 extends Phaser.Scene {
     }
 
     create() {
+        if (this.scene.isActive('Level1')) {
+            console.log('💣 Shutting down Level1 from inside Level3');
+            this.scene.stop('Level1');
+          }
+        console.log(`inital test: ${player.getLocation()}`);
+
+        if (player.getLocation() !== 'Level3') {
+            console.log(`inital test: ${player.getLocation()}`);
+            player.setLocation('Level3');
+            console.log(`after test: ${player.getLocation()}`);
+        }
+
+        // Update the location in the App (React side)
+        if (this.game.reactSetCurrentLocation) {
+            this.game.reactSetCurrentLocation('Level3');
+        }
+
         const { width, height } = this.scale;
         const centerX = width / 2;
         
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+
 
         // Setup tilemap
         const map = this.add.tilemap("levelThreeMap");
@@ -84,12 +106,13 @@ export default class Level3 extends Phaser.Scene {
             console.log('Level 2 shutdown, removing listener.');
             this.game.events.off('commandInput', this.handleCommand, this);
             // Reset state for potential restarts if needed (or handle in init/create)
-            this.inventory.clear();
             this.stagedItems.clear();
         });
 
         // Initial state update
         this.updateStatusText();
+
+
 
         // Player controller
         this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
@@ -100,16 +123,23 @@ export default class Level3 extends Phaser.Scene {
         this.playerController.update();
     }
 
-    collectItem(player, item) {
+    collectItem(playerSprite, item) {
         const itemName = item.getData('itemName');
-        if (!this.inventory.has(itemName)) {
-            this.inventory.add(itemName);
+        // resets here.
+        player.setLocation('Level3');
+        console.log(`collect start: ${player.getLocation()}`);
+        const currentItems = player.getInventory();
+        console.log(`after setup: ${player.getLocation()}`);
+    
+        if (!currentItems.includes(itemName)) {
+            player.addItem(itemName);
+            console.log(`after add: ${player.getLocation()}`);
             console.log(`Collected: ${itemName}`);
+            console.log(`Location: ${player.getLocation()}`);
+
             this.setFeedback(`Collected ${itemName}! Find the others.`);
-
-            // Remove item from the scene
+    
             item.disableBody(true, true);
-
             this.updateStatusText();
         }
     }
@@ -137,7 +167,7 @@ export default class Level3 extends Phaser.Scene {
         }
 
         // Check if the player has collected the item
-        if (!this.inventory.has(target)) {
+        if (!GameManager.getPlayer().getInventory().includes(target)) {
             this.setFeedback(`You haven't collected the ${target} yet!`);
             return;
         }
@@ -184,10 +214,10 @@ export default class Level3 extends Phaser.Scene {
     }
 
     updateStatusText() {
-         // Use Array.from() to convert Set to Array for joining
-         const collectedList = Array.from(this.inventory).join(', ') || 'None';
-         const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-         this.collectedText.setText(`Collected: ${collectedList}`);
-         this.stagedText.setText(`Staged: ${stagedList}`);
+        const player = GameManager.getPlayer();
+        const collectedList = player.getInventory().join(', ') || 'None';
+        const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
+        this.collectedText.setText(`Collected: ${collectedList}`);
+        this.stagedText.setText(`Staged: ${stagedList}`);
     }
 }
