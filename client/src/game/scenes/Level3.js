@@ -30,6 +30,9 @@ export default class Level3 extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
+    this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
+    this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
     // Assets should be preloaded by your Preloader.
     // If not, you can load here:
     this.load.image('copper', 'assets/copper.png');
