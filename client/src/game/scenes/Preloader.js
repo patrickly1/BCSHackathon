@@ -57,7 +57,17 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('gem', 'assets/gem.png');
     this.load.image('anvil', 'assets/anvil.png');
     //load music
-    this.load.audio("bgm", "assets/modern_bits.ogg");
+    this.load.audio("bgm", [
+        "assets/modern_bits.ogg",
+        "assets/modern_bits.mp3"
+    ]);
+    this.load.audio("robot", "assets/sounds/Robot.wav");
+    this.load.audio("level-delay-sound", "assets/sounds/level-delay-sound.wav");
+    this.load.audio("pickup-coin", "assets/sounds/level3/pickup-coin.wav");
+    this.load.audio("alarm", "assets/sounds/level4/alarm.wav");
+    this.load.audio("ship-sounds", "assets/sounds/level4/ship-sounds.wav");
+    this.load.audio("spawn-ship", "assets/sounds/level4/spawn-ship.wav");
+
     // this.load.image('shield', 'assets/shield.png');
     // this.load.image('map', 'assets/map.png');
     //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });

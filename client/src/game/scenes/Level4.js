@@ -31,6 +31,8 @@ export default class Level4 extends Phaser.Scene {
     this.load.image("spaceship", 'assets/level/base/spaceship.png');
     this.load.image("portal", 'assets/level/base/portal.png'); // Make sure this asset exists
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj');
+
+    this.robotSound = this.sound.add("robot");
   }
 
   create() {
@@ -172,14 +174,21 @@ export default class Level4 extends Phaser.Scene {
 
     // Check distance between the player and the robot (for robot instruction)
     if (this.robot && this.robotInstruction) {
-      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
-      const threshold = 50;
-      this.robotInstruction.setVisible(distance < threshold);
-      if (this.robotAlert) {
+    const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
+    const threshold = 50; // Adjust as needed
+    this.robotInstruction.setVisible(distance < threshold);
+    
+    if (this.robotAlert && !this.robotInteracted) {
         this.robotAlert.setVisible(distance >= threshold);
-      }
     }
 
+
+    if (distance < threshold && !this.robotInteracted) {
+        this.robotInteracted = true;
+        this.robotSound.play();
+    }
+    }}
+  
     // In update() method, add this after your existing update logic:
     if (this.resetDone && !this.hasBoarded && this.player) {
         const pushX = this.scale.width * 0.5;
@@ -195,6 +204,7 @@ export default class Level4 extends Phaser.Scene {
     }
     // Removed automatic spaceship boarding from update()
   }
+
 
   handleCommand(command) {
     const parts = command.trim().toLowerCase().split(' ');
