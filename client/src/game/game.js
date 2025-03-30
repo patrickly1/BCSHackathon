@@ -16,7 +16,7 @@ export function initGame(container, options = {}) {
     // loads the current player
   
     // If a saved location exists, use it
-    const startingScene = GameManager.getPlayer().getLocation() || 'Level0';
+    const startingScene = GameManager.getPlayer().getLocation() || 'Level4';
   
     // Wait for the game to be ready before switchin
 
