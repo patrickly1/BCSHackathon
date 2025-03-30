@@ -1,4 +1,7 @@
 import Phaser from 'phaser';
+import GameManager from '../GameManager';
+
+// uses GameManager to load in a specific level.
 
 export default class Preloader extends Phaser.Scene {
   constructor() {
@@ -54,7 +57,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('anvil', 'assets/anvil.png');
     // this.load.image('shield', 'assets/shield.png');
     // this.load.image('map', 'assets/map.png');
-    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
+    //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
     // ... load all other assets
 
     // Tilemap
@@ -63,8 +67,41 @@ export default class Preloader extends Phaser.Scene {
   }
 
   create() {
-    // Assets loaded, start the first level
+    const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
+    console.log(`Preloader complete. Starting ${savedLocation}.`);
+    this.scene.start(savedLocation);
+    
     console.log("Preloader complete. Starting Level 1.");
-    this.scene.start('Level1'); // <<<< START YOUR FIRST LEVEL HERE
+
+      //Player animations
+      this.anims.create({
+          key: "walk-right",
+          frames: this.anims.generateFrameNumbers("player", { frames: [15, 16, 17, 18, 19] }),
+          frameRate: 16,
+          repeat: -1,
+          yoyo: true,
+      });
+      this.anims.create({
+          key: "walk-up",
+          frames: this.anims.generateFrameNumbers("player", { frames: [4, 5, 4, 6] }),
+          frameRate: 8,
+          repeat: -1,
+      });
+      this.anims.create({
+          key: "walk-down",
+          frames: this.anims.generateFrameNumbers("player", { frames: [7, 8, 7, 9] }),
+          frameRate: 8,
+          repeat: -1,
+      });
+      this.anims.create({
+          key: "idle",
+          frames: this.anims.generateFrameNumbers("player", {
+              frames: [0, 0, 0, 0, 0, 0, 0, 0, 46, 47, 48, 47, 48, 47, 48, 47, 46],
+          }),
+          frameRate: 4,
+          repeat: -1,
+      });
+
+      this.scene.start("Level1"); //Start first level
   }
 }

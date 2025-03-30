@@ -1,5 +1,6 @@
 // client/src/game/scenes/Level2.js (or Level3.js, Level4.js, etc.)
 import Phaser from 'phaser';
+import GameManager from '../GameManager';
 
 const PLAYER_SPEED = 160;
 const REQUIRED_BRANCH_NAME = 'secret-tunnel';
@@ -11,12 +12,13 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
         this.player = null;
         this.keys = null;
         this.feedbackText = null;
-        // No longer need this.terminalOpen for the update loop guard,
-        // but can keep it if needed for other logic. Let's remove it for clarity here.
-        // this.terminalOpen = false;
         this.mapImage = null;
         this.branchCreated = false;
         this.checkedOut = false;
+        // Game logic state
+        // this.inventory = new Set(); // Items the player has picked up
+
+        this.stagedItems = new Set(); // Items successfully 'git add'-ed
     }
 
     // ... preload() ...
@@ -92,6 +94,21 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
             // --- *** END CHANGE *** ---
             this.branchCreated = false;
             this.checkedOut = false;
+          
+             GameManager.getPlayer().setLocation('Level2');
+        // sets location of player to level2
+
+        if (this.game.reactSetCurrentLocation) {
+            this.game.reactSetCurrentLocation('Level2');
+          }
+          
+        this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+
+        // Setup tilemap
+        const map = this.add.tilemap("map");
+        const tiles = map.addTilesetImage("tiles", "tiles2");
+        const groundLayer = map.createLayer("Ground", tiles);
+        const wallLayer = map.createLayer("Walls", tiles);
         });
 
         this.setFeedback(`Hint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
@@ -127,20 +144,42 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
     
         if (this.keys.A.isDown) {
             this.player.setVelocityX(-PLAYER_SPEED);
-            this.player.flipX = true;
+            this.player.setFlipX(true); // Mirror horizontally
+            this.player.anims.play("walk-right", true);
         } else if (this.keys.D.isDown) {
             this.player.setVelocityX(PLAYER_SPEED);
-            this.player.flipX = false;
-        }
-    
-        if (this.keys.W.isDown) {
+            this.player.setFlipX(false);
+            this.player.play("walk-right", true);
+        } else if (this.keys.W.isDown) {
             this.player.setVelocityY(-PLAYER_SPEED);
+            this.player.play("walk-up", true);
         } else if (this.keys.S.isDown) {
             this.player.setVelocityY(PLAYER_SPEED);
+            this.player.play("walk-down", true);
+        } else {
+            this.player.play("idle", true);
         }
     
         this.player.body.velocity.normalize().scale(PLAYER_SPEED);
+      // --- Add simple player direction facing (optional) ---
+        // if (this.keys.A.isDown) this.player.flipX = true;
+        // if (this.keys.D.isDown) this.player.flipX = false;
     }
+
+    collectItem(playerSprite, item) {
+    const itemName = item.getData('itemName');
+    const player = GameManager.getPlayer();
+    const currentItems = player.getInventory();
+
+    if (!currentItems.includes(itemName)) {
+        player.addItem(itemName);
+        console.log(`Collected: ${itemName}`);
+        this.setFeedback(`Collected ${itemName}! Find the others.`);
+
+        item.disableBody(true, true);
+        this.updateStatusText();
+    }
+}
 
     // ... handleCommand() ... (Keep existing, ensure scene transition is correct)
     handleCommand(command) {
@@ -158,8 +197,8 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
             } else { this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`); }
             return;
         }
-
-        if (action === 'git' && verb === 'checkout' && arg) {
+      
+       if (action === 'git' && verb === 'checkout' && arg) {
              if (arg === REQUIRED_BRANCH_NAME) {
                 if (this.branchCreated) {
                     if (!this.checkedOut) {
@@ -174,6 +213,9 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
                     } else { this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`); }
                 } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`); }
             } else { this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`); }
+         const player = GameManager.getPlayer();
+        if (!player.getInventory().includes(target)) {
+            this.setFeedback(`You haven't collected the ${target} yet!`);
             return;
         }
         this.setFeedback(`Unknown command. Try 'git branch ...' or 'git checkout ...'`);
@@ -185,11 +227,18 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
         this.cameras.main.setBackgroundColor('#34495e');
         this.add.text(this.scale.width / 2, this.scale.height / 2, 'Passage Opened!', { fontSize: '20px', fill: '#0f0' }).setOrigin(0.5);
     }
-
+      
     // ... setFeedback() ... (Keep existing)
     setFeedback(message) {
          if (this.feedbackText && this.feedbackText.active) {
              this.feedbackText.setText(message);
          }
+    updateStatusText() {
+       // Use Array.from() to convert Set to Array for joining
+       const player = GameManager.getPlayer();
+       const collectedList = player.getInventory().join(', ') || 'None';
+       const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
+       this.collectedText.setText(`Collected: ${collectedList}`);
+       this.stagedText.setText(`Staged: ${stagedList}`);
     }
 }
