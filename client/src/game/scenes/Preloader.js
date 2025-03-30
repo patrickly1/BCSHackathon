@@ -61,6 +61,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("robot", "assets/EnemyRobot_Idle.png", { frameWidth: 32, frameHeight: 32 });
     // ... load all other assets
+    this.load.spritesheet("planet", "assets/level/level0/planet.png", { frameWidth: 100, frameHeight: 100 });
 
     // Tilemap (level2)
     this.load.image("tiles2", 'assets/level/tiles.png')
@@ -116,6 +117,14 @@ export default class Preloader extends Phaser.Scene {
           frameRate: 4, // 4 frames per second
           repeat: -1, // loop forever
       });
-      this.scene.start("Level5"); //Start first level
+
+      this.anims.create({
+        key: "spinning-planet",
+        frames: this.anims.generateFrameNumbers("planet", { start: 0, end: 159 }),
+        frameRate: 15, // 4 frames per second
+        repeat: -1, // loop forever
+      })
+
+      this.scene.start("Level0"); //Start first level
   }
 }
