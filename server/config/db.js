@@ -2,11 +2,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/gitout', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: 'gitopia', // 👈 this sets the database name
     });
-    console.log('✅ MongoDB connected');
+    console.log('✅ MongoDB Atlas connected to gitopia');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
     process.exit(1);

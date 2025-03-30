@@ -2,19 +2,30 @@ const express = require('express');
 const router = express.Router();
 const Save = require('../models/Save');
 
-// this saves a user.
+
 router.post('/', async (req, res) => {
-    const { username, timeElapsed, currentLocation, inventory } = req.body;
+  const { userId, username, timeElapsed, currentLocation, inventory } = req.body;
+
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  const saveData = {
+    userId,
+    username,
+    timeElapsed,
+    currentLocation,
+    inventory,
+  };
 
   try {
     const save = await Save.findOneAndUpdate(
-      { username },
-      { timeElapsed, currentLocation, inventory },
+      { userId },
+      saveData,
       { upsert: true, new: true }
     );
     res.json(save);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to save progress' });
+    console.error('Save failed:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -31,20 +42,19 @@ router.get('/', async (req, res) => {
 
 
 // this is the router to get all the data related to a specific username
-router.get('/:username', async (req, res) => {
-  try {
-    const save = await Save.findOne({
-      username: new RegExp(`^${req.params.username}$`, 'i'),
-    });
-
-    if (!save) {
-      return res.status(404).json({ error: 'Save file not found' });
+router.get('/:userId', async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const save = await Save.findOne({ userId });
+      if (!save) {
+        return res.status(404).json({ error: 'Save not found' });
+      }
+      res.json(save);
+    } catch (err) {
+      console.error('Load failed:', err);
+      res.status(500).json({ error: 'Server error' });
     }
-
-    res.json(save);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch save file' });
-  }
-});
+  });
 
 module.exports = router;
