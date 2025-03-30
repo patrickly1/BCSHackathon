@@ -32,6 +32,8 @@ export default class Level2 extends Phaser.Scene {
         this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
         this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
         this.load.image('level2_bg',"assets/level/crashsite/level2_bg.png");
+
+        this.robotSound = this.sound.add("robot");
     }
 
     create() {
@@ -216,6 +218,7 @@ export default class Level2 extends Phaser.Scene {
 
             if (distance < threshold && !this.robotInteracted) {
                 this.robotInteracted = true;
+                this.robotSound.play();
             }
         }
 

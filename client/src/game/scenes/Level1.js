@@ -16,6 +16,7 @@ export default class Level1 extends Phaser.Scene {
 
   preload() {
     this.load.image('level1_bg', "assets/level/start/level1_bg.png");
+    this.robotSound = this.sound.add("robot");
   }
 
   create() {
@@ -156,12 +157,14 @@ export default class Level1 extends Phaser.Scene {
           const threshold = 50; // Adjust as needed
           this.robotInstruction.setVisible(distance < threshold);
 
+
           if (this.robotAlert && !this.robotInteracted) {
               this.robotAlert.setVisible(distance >= threshold);
           }
 
           if (distance < threshold && !this.robotInteracted) {
               this.robotInteracted = true;
+              this.robotSound.play();
           }
       }
   }

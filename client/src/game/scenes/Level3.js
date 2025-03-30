@@ -40,6 +40,8 @@ export default class Level3 extends Phaser.Scene {
     this.load.image('copper', 'assets/copper.png');
     this.load.image('iron', 'assets/iron.png');
     // Ensure the "player" asset is loaded in your Preloader or here if needed
+
+    this.robotSound = this.sound.add("robot");
   }
 
   create() {
@@ -187,6 +189,7 @@ export default class Level3 extends Phaser.Scene {
 
       if (distance < threshold && !this.robotInteracted) {
         this.robotInteracted = true;
+        this.robotSound.play();
       }
     }
   }
