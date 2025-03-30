@@ -77,7 +77,7 @@ export default class Preloader extends Phaser.Scene {
 
   }
   create() {
-    const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
+    const savedLocation = GameManager.getPlayer().getLocation() || 'Level0';
     console.log(`Preloader complete. Starting ${savedLocation}.`);
     this.scene.start(savedLocation);
 
@@ -116,6 +116,6 @@ export default class Preloader extends Phaser.Scene {
           frameRate: 4, // 4 frames per second
           repeat: -1, // loop forever
       });
-      this.scene.start("Level1"); //Start first level
+      this.scene.start("Level0"); //Start first level
   }
 }
