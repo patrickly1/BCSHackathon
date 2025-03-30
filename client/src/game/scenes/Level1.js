@@ -23,8 +23,21 @@ export default class Level1 extends Phaser.Scene {
     // Initial state: Shadowy void with a torch
     // this.torch = this.add.image(100, 100, 'torch').setScale(0.5); // Example position/asset
 
-    this.add.text(240, 30, 'Area 1: Space', { fontSize: '20px', fill: '#fff' }).setOrigin(0.5);
-    this.feedbackText = this.add.text(240, 190, "You’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\nPress T to open terminal.\n\n-> Type 'git clone gitopia'", { fontSize: '13px', fill: '#aaa' }).setOrigin(0.5);
+    this.add
+        .text(240, 32, "Area 1: Space", {
+            fontSize: "16px",
+            fontFamily: "Minecraft",
+            fill: "#fff",
+        })
+        .setOrigin(0.5);
+    this.feedbackText = this.add
+        .text(
+            240,
+            140,
+            "Press T to open terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
+            { fontSize: "16px", fontFamily: "Minecraft", fill: "#aaa" }
+        )
+        .setOrigin(0.5);
 
     // Listen for commands from the React Terminal via the global event emitter
     this.game.events.on('commandInput', this.handleCommand, this);
