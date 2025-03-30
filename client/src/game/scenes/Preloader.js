@@ -61,7 +61,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("robot", "assets/EnemyRobot_Idle.png", { frameWidth: 32, frameHeight: 32 });
     // ... load all other assets
-    this.load.spritesheet("planet", "assets/planet.png", { frameWidth: 100, frameHeight: 100 });
+    this.load.spritesheet("planet", "assets/level/level0/planet.png", { frameWidth: 100, frameHeight: 100 });
 
     // Tilemap (level2)
     this.load.image("tiles2", 'assets/level/tiles.png')
