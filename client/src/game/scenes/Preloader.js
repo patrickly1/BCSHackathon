@@ -137,6 +137,6 @@ export default class Preloader extends Phaser.Scene {
         repeat: -1, // loop forever
     });
 
-      this.scene.start("Level0"); //Start first level
+      this.scene.start("Level3"); //Start first level
   }
 }
