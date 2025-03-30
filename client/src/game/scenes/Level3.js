@@ -1,5 +1,5 @@
-// client/src/game/scenes/Level3.js
 import Phaser from 'phaser';
+import PlayerController from '../PlayerController';
 
 const PLAYER_SPEED = 200; // Pixels per second
 const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
@@ -27,6 +27,8 @@ export default class Level3 extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+        const centerX = width / 2;
+        
         this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
 
         // Setup tilemap
@@ -47,7 +49,7 @@ export default class Level3 extends Phaser.Scene {
         this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
 
         // --- Setup Player ---
-        this.player = this.physics.add.sprite(100, 450, 'player'); // Starting position
+        this.player = this.physics.add.sprite(centerX, 240, 'player').setScale(2.5); // Starting position
         this.player.setCollideWorldBounds(true); // Keep player within game bounds
         // Optional: Set player size if sprite needs adjusting
         // this.player.setSize(20, 32).setOffset(6, 16);
@@ -88,33 +90,14 @@ export default class Level3 extends Phaser.Scene {
 
         // Initial state update
         this.updateStatusText();
+
+        // Player controller
+        this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
     }
 
     update(time, delta) {
-        if (!this.player || !this.keys) return; // Guard clause
-
-        this.player.setVelocity(0);
-
-        // Horizontal movement
-        if (this.keys.A.isDown) {
-            this.player.setVelocityX(-PLAYER_SPEED);
-        } else if (this.keys.D.isDown) {
-            this.player.setVelocityX(PLAYER_SPEED);
-        }
-
-        // Vertical movement
-        if (this.keys.W.isDown) {
-            this.player.setVelocityY(-PLAYER_SPEED);
-        } else if (this.keys.S.isDown) {
-            this.player.setVelocityY(PLAYER_SPEED);
-        }
-
-        // Normalize speed for diagonal movement
-        this.player.body.velocity.normalize().scale(PLAYER_SPEED);
-
-        // --- Add simple player direction facing (optional) ---
-        // if (this.keys.A.isDown) this.player.flipX = true;
-        // if (this.keys.D.isDown) this.player.flipX = false;
+        if (!this.input.keyboard.enabled) return;
+        this.playerController.update();
     }
 
     collectItem(player, item) {
