@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
+import PlayerController from "../PlayerController";
 
-
+const PLAYER_SPEED = 160;
 
 export default class Level1 extends Phaser.Scene {
   constructor() {
@@ -28,18 +29,23 @@ export default class Level1 extends Phaser.Scene {
     // Listen for commands from the React Terminal via the global event emitter
     this.game.events.on('commandInput', this.handleCommand, this);
 
+    // --- Player ---
+    this.player = this.physics.add.sprite(width / 2, 320, "player").setScale(2.5);
+    this.player.setCollideWorldBounds(true);
 
+    // --- Input ---
+            // Still add keys so they are ready when input is enabled
+            this.keys = this.input.keyboard.addKeys("W,A,S,D");
+    
+            this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
     // Add collision
     // Create a static group to hold collision zones
 
     // Red Rectangle for debugging
-    const zone1 = this.add.rectangle(80, 285, 300, 65, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
-    const zone2 = this.add.rectangle(160, 350, 150, 40, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
-    this.physics.add.existing(zone1, true); // true = static body
-    this.physics.add.existing(zone2, true); // true = static body
-
-
-
+    // const zone1 = this.add.rectangle(80, 285, 300, 65, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+    // const zone2 = this.add.rectangle(160, 350, 150, 40, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+    // this.physics.add.existing(zone1, true); // true = static body
+    // this.physics.add.existing(zone2, true); // true = static body
 
     // Cleanup listener when scene is destroyed
     this.events.on('shutdown', () => {
@@ -70,6 +76,9 @@ export default class Level1 extends Phaser.Scene {
 
 
   update() {
-    // Add any real-time updates if needed
+    if (!this.input.keyboard.enabled) return;
+        this.playerController.update();
+        this.player.x = Phaser.Math.Clamp(this.player.x, 140, 340);
+        this.player.y = Phaser.Math.Clamp(this.player.y, 280, 350);
   }
 }
