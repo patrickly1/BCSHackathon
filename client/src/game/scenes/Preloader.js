@@ -61,11 +61,20 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
     // ... load all other assets
 
-    // Tilemap
+    // Tilemap (level2)
     this.load.image("tiles2", 'assets/level/tiles.png')
     this.load.tilemapTiledJSON("map", 'assets/level/tilemap.tmj')
-  }
 
+    // Tilemap (level3)
+    this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
+    this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
+    this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
+
+    // Tilemap (level4)
+    this.load.image("baseTiles", 'assets/level/base/tiles.png')
+    this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
+
+  }
   create() {
     const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
     console.log(`Preloader complete. Starting ${savedLocation}.`);
