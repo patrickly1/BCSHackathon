@@ -16,18 +16,30 @@ export default class Level0 extends Phaser.Scene {
     const { width, height } = this.scale;
 
     // Set a dark background for the title screen.
-    this.cameras.main.setBackgroundColor('#242424');
+    this.cameras.main.setBackgroundColor('#000000');
 
     // Display a title.
-    this.add.text(width / 2, height / 2 - 100, 'Welcome to the Game!', {
-      fontSize: '48px',
+    this.add.text(width / 2, 50, 'Welcome to the Game!', {
+      fontSize: '24px',
+      fontFamily: "Minecraft",
       fill: '#ffffff'
     }).setOrigin(0.5);
 
+    const centerX = width / 2;
+    const centerY = width / 2;
+
+    const planetX = centerX;
+    const planetY = centerY - 40;
+
+    this.planet = this.physics.add.sprite(planetX, planetY, "planet").setScale(1.5);
+    this.planet.anims.play("spinning-planet");
+    this.planet.setOrigin(0.5); // Center the sprite's origin (optional)
+
     // Create an interactive "Play" button.
     // This example uses interactive text, but you can use an image if you prefer.
-    const playButton = this.add.text(width / 2, height / 2, 'Play', {
+    const playButton = this.add.text(width / 2, height / 2 + 95, 'Play', {
       fontSize: '32px',
+      fontFamily: "Minecraft",
       fill: '#00ff00',
       backgroundColor: '#000',
       padding: { x: 20, y: 10 }
