@@ -18,10 +18,7 @@ export default class Level4 extends Phaser.Scene {
   }
 
   preload() {
-    // Preload any assets needed for this level.
-    // For example, a mine image and the player sprite.
-    this.load.image('mine', 'assets/mine.png');
-    this.load.image('player', 'assets/player.png');
+
   }
 
   create() {
@@ -30,6 +27,12 @@ export default class Level4 extends Phaser.Scene {
 
     // Set a dark background for a final, tense feel
     this.cameras.main.setBackgroundColor('#1a1a1a');
+
+    // Setup tilemap
+    const map = this.add.tilemap("levelFourMap");
+    const mainTiles = map.addTilesetImage("tiles", "baseTiles")
+    const floorLayer = map.createLayer("Floor", mainTiles)
+    const wallLayer = map.createLayer("Walls", mainTiles)
 
     // Title text
     this.add.text(centerX, 30, 'Level 4: The Final Merge', {
@@ -43,13 +46,14 @@ export default class Level4 extends Phaser.Scene {
       fill: '#aaa'
     }).setOrigin(0.5);
 
-    // Create a mine image (representing the items to be stashed)
-    const mine = this.add.image(centerX, height / 2, 'mine');
-    mine.setScale(0.5);
-
     // Create the player sprite (for movement only)
     this.player = this.physics.add.sprite(centerX, height - 80, 'player');
     this.player.setCollideWorldBounds(true);
+
+    // --- Setup Collision ---
+    // Add collisions
+    wallLayer.setCollisionByProperty({ collides: true });
+    this.physics.add.collider(this.player, wallLayer);
 
     // Setup WASD input for movement
     this.keys = this.input.keyboard.addKeys('W,A,S,D');
