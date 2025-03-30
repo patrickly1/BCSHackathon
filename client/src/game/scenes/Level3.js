@@ -137,7 +137,7 @@ export default class Level3 extends Phaser.Scene {
         if (!this.scene.isActive()) {
             return; // Don't process if scene is not active
         }
-        console.log(`Level 2 received command: ${command}`);
+        console.log(`Level 3 received command: ${command}`);
 
         const parts = command.trim().toLowerCase().split(' '); // Split command into parts
         const action = parts[0];

@@ -1,60 +1,61 @@
-// client/src/game/scenes/Level2.js
+// client/src/game/scenes/Level2.js (or Level3.js, Level4.js, etc.)
 import Phaser from 'phaser';
 
-const PLAYER_SPEED = 160; // Pixels per second
-const REQUIRED_BRANCH_NAME = 'secret-tunnel'; // The name players need to use
+const PLAYER_SPEED = 160;
+const REQUIRED_BRANCH_NAME = 'secret-tunnel';
 
-export default class Level2 extends Phaser.Scene {
+export default class Level2 extends Phaser.Scene { // Adjust class name per level
     constructor() {
-        super('Level2');
+        super('Level2'); // Adjust scene key per level
 
-        // Scene state
         this.player = null;
         this.keys = null;
         this.feedbackText = null;
-        this.mapImage = null; // Optional visual cue
-
-        // Game logic state
+        // No longer need this.terminalOpen for the update loop guard,
+        // but can keep it if needed for other logic. Let's remove it for clarity here.
+        // this.terminalOpen = false;
+        this.mapImage = null;
         this.branchCreated = false;
         this.checkedOut = false;
     }
 
-    preload() {
-        // Assets should be loaded by Preloader.js
-        // this.load.image('map', 'assets/map.png'); // Ensure map is loaded if used
-    }
+    // ... preload() ...
 
     create() {
-        // Use relative positioning
         const { width, height } = this.scale;
         const centerX = width / 2;
-        const centerY = height / 2;
+        // ... other setup ...
+        this.cameras.main.setBackgroundColor('#2c3e50');
 
-        this.cameras.main.setBackgroundColor('#2c3e50'); // A different dungeon area color
+        // --- *** CHANGE HERE: Listen for toggle and handle enable/disable *** ---
+        this.game.events.on("terminalToggled", this.handleTerminalToggle, this);
+        // Ensure keyboard input is ENABLED initially
+        this.input.keyboard.enabled = true;
+        // --- *** END CHANGE *** ---
 
-        // --- Setup UI Text ---
-        this.add.text(centerX, 30, 'Level 2: The Mystic Map', { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(centerX, height - 30, 'Explore... Maybe create a new path? (Press T)', { fontSize: '12px', fill: '#aaa' }).setOrigin(0.5);
 
-        // --- Optional Visual Cue (Map) ---
-        // If you have a map image, display it. It can react to commands.
-        // this.mapImage = this.add.image(centerX, centerY - 50, 'map').setScale(0.8);
+        // --- UI Text ---
+        this.add.text(centerX, 30, 'Level 2: The Mystic Map', { fontSize: '18px', fill: '#fff' }).setOrigin(0.5); // Adjust title
+        this.feedbackText = this.add.text(centerX, height - 30, 'Explore... (Press T)', { fontSize: '12px', fill: '#aaa' }).setOrigin(0.5);
 
-        // --- Setup Player ---
-        this.player = this.physics.add.sprite(centerX, height - 80, 'player'); // Start near bottom-center
+        // --- Player ---
+        this.player = this.physics.add.sprite(centerX, height - 80, 'player');
         this.player.setCollideWorldBounds(true);
 
-        // --- Setup Input ---
+        // --- Input ---
+        // Still add keys so they are ready when input is enabled
         this.keys = this.input.keyboard.addKeys('W,A,S,D');
 
-        // Listen for commands from React Terminal
+        // Command listener
         this.game.events.on('commandInput', this.handleCommand, this);
 
-        // Cleanup listener
+        // Shutdown cleanup
         this.events.on('shutdown', () => {
-            console.log('Level 2 shutdown, removing listener.');
+            console.log('Level 2 shutdown, removing listeners.');
             this.game.events.off('commandInput', this.handleCommand, this);
-            // Reset state for potential restarts
+            // --- *** CHANGE HERE: Remove the terminal toggle listener *** ---
+            this.game.events.off("terminalToggled", this.handleTerminalToggle, this);
+            // --- *** END CHANGE *** ---
             this.branchCreated = false;
             this.checkedOut = false;
         });
@@ -62,116 +63,96 @@ export default class Level2 extends Phaser.Scene {
         this.setFeedback(`Hint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
     }
 
+    // --- *** ADD THIS METHOD *** ---
+    handleTerminalToggle(isOpen) {
+        console.log(`Phaser Scene: Setting keyboard input = ${!isOpen}`);
+    
+        if (isOpen) {
+            // Terminal is OPEN, disable all keyboard input in Phaser
+            this.input.keyboard.enabled = false;
+            this.input.keyboard.removeAllListeners(); // 🚨 Stop listening to all key events
+        } else {
+            // Terminal is CLOSED, re-enable keyboard input
+            this.input.keyboard.enabled = true;
+    
+            // Re-add keys manually after clearing listeners
+            this.keys = this.input.keyboard.addKeys('W,A,S,D');
+        }
+    
+        // Ensure player stops moving immediately when terminal opens
+        if (isOpen && this.player) {
+            this.player.setVelocity(0);
+        }
+    }
+    // --- *** END ADDED METHOD *** ---
+
     update(time, delta) {
-        if (!this.player || !this.keys) return;
-
+        if (!this.player || !this.keys || !this.input.keyboard.enabled) return; // 🚨 Prevent movement if keyboard is disabled
+    
         this.player.setVelocity(0);
-
-        // Horizontal movement
+    
         if (this.keys.A.isDown) {
             this.player.setVelocityX(-PLAYER_SPEED);
-            this.player.flipX = true; // Face left
+            this.player.flipX = true;
         } else if (this.keys.D.isDown) {
             this.player.setVelocityX(PLAYER_SPEED);
-            this.player.flipX = false; // Face right
+            this.player.flipX = false;
         }
-
-        // Vertical movement
+    
         if (this.keys.W.isDown) {
             this.player.setVelocityY(-PLAYER_SPEED);
         } else if (this.keys.S.isDown) {
             this.player.setVelocityY(PLAYER_SPEED);
         }
-
-        // Normalize speed
+    
         this.player.body.velocity.normalize().scale(PLAYER_SPEED);
     }
 
+    // ... handleCommand() ... (Keep existing, ensure scene transition is correct)
     handleCommand(command) {
-        if (!this.scene.isActive() || this.checkedOut) {
-             if(this.checkedOut) {
-                this.setFeedback("You've already found the secret passage!");
-             }
-            return; // Don't process if scene inactive or level already passed
-        }
+        if (!this.scene.isActive() || this.checkedOut) { /* ... */ return; }
         console.log(`Level 2 received command: ${command}`);
-
         const parts = command.trim().toLowerCase().split(' ');
-        const action = parts[0];
-        const verb = parts[1];
-        const arg = parts[2]; // Branch name
+        const action = parts[0]; const verb = parts[1]; const arg = parts[2];
 
-        // --- Handle 'git branch' ---
-        if (action === 'git' && verb === 'branch') {
-            if (parts.length === 3) { // Expecting 'git branch <name>'
-                if (arg === REQUIRED_BRANCH_NAME) {
-                    if (!this.branchCreated) {
-                        this.branchCreated = true;
-                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' created! Now switch to it.`);
-                        console.log('Branch created successfully');
-                        // Optional visual feedback: make map glow?
-                        // if (this.mapImage) this.mapImage.setTint(0xffff00);
-                    } else {
-                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`);
-                    }
-                } else {
-                    this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`);
-                }
-            } else {
-                 this.setFeedback(`Usage: git branch <branch-name>`);
-            }
-            return; // Command processed (or failed validation)
+        if (action === 'git' && verb === 'branch' && arg) {
+            if (arg === REQUIRED_BRANCH_NAME) {
+                if (!this.branchCreated) {
+                    this.branchCreated = true;
+                    this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' created! Now switch to it.`);
+                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`); }
+            } else { this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`); }
+            return;
         }
 
-        // --- Handle 'git checkout' ---
-        if (action === 'git' && verb === 'checkout') {
-            if (parts.length === 3) { // Expecting 'git checkout <name>'
-                 if (arg === REQUIRED_BRANCH_NAME) {
-                    if (this.branchCreated) {
-                        if (!this.checkedOut) {
-                            // --- SUCCESS ---
-                            this.checkedOut = true;
-                            this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
-                            console.log('Checkout successful!');
-                            this.revealPassage(); // Trigger visual change
-
-                            // Transition to next level
-                            this.time.delayedCall(2500, () => {
-                                this.scene.start('Level3'); // <<<< CHANGE TO YOUR NEXT LEVEL KEY
-                            });
-                        } else {
-                             // Should technically be blocked by the check at the start of the function
-                             this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`);
-                        }
-                    } else {
-                        this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`);
-                    }
-                } else {
-                    this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`);
-                }
-            } else {
-                 this.setFeedback(`Usage: git checkout <branch-name>`);
-            }
-            return; // Command processed
+        if (action === 'git' && verb === 'checkout' && arg) {
+             if (arg === REQUIRED_BRANCH_NAME) {
+                if (this.branchCreated) {
+                    if (!this.checkedOut) {
+                        this.checkedOut = true;
+                        this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
+                        this.revealPassage();
+                        this.time.delayedCall(2500, () => {
+                            // --- MAKE SURE this transitions to the correct NEXT level ---
+                            this.scene.start('Level3'); // Or Level4, Level5 etc.
+                            // --- END ---
+                        });
+                    } else { this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`); }
+                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`); }
+            } else { this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`); }
+            return;
         }
-
-        // --- Fallback for unknown commands ---
-        this.setFeedback(`Unknown command. Try 'git branch ${REQUIRED_BRANCH_NAME}' or 'git checkout ${REQUIRED_BRANCH_NAME}'`);
+        this.setFeedback(`Unknown command. Try 'git branch ...' or 'git checkout ...'`);
     }
 
-    revealPassage() {
-        // Simple visual feedback: change background slightly
-        this.cameras.main.setBackgroundColor('#34495e'); // Darker shade maybe
+
+    // ... revealPassage() ... (Keep existing)
+     revealPassage() {
+        this.cameras.main.setBackgroundColor('#34495e');
         this.add.text(this.scale.width / 2, this.scale.height / 2, 'Passage Opened!', { fontSize: '20px', fill: '#0f0' }).setOrigin(0.5);
-
-        // Stop player movement maybe?
-        // this.player.setVelocity(0);
-        // this.player.setActive(false);
-
-        // If using map, maybe change its tint or image
-        // if (this.mapImage) this.mapImage.setTint(0x00ff00).setScale(0.9); // Green tint
     }
 
+    // ... setFeedback() ... (Keep existing)
     setFeedback(message) {
          if (this.feedbackText && this.feedbackText.active) {
              this.feedbackText.setText(message);
