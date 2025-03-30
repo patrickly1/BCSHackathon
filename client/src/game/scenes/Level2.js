@@ -24,7 +24,7 @@ export default class Level2 extends Phaser.Scene {
 
     // ... preload() ...
     preload() {
-        this.load.image("robot", "assets/EnemyRobot_Idle.png");
+        
     }
 
     create() {
@@ -72,7 +72,8 @@ export default class Level2 extends Phaser.Scene {
             .setOrigin(0.5);
 
         // Spawn the robot sprite
-        this.robot = this.physics.add.sprite(robotX, robotY, "robot");
+        this.robot = this.physics.add.sprite(100, 100, "robot").setScale(1.5);
+        this.robot.anims.play("robot-idle");
         this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
         this.robot.setCollideWorldBounds(true); // Prevent the robot from leaving the game bounds (optional)
         // ... other setup ...
@@ -85,7 +86,7 @@ export default class Level2 extends Phaser.Scene {
         // --- *** END CHANGE *** ---
 
         // --- UI Text ---
-        this.add.text(centerX, 30, "Level 2: The Mystic Map", { fontSize: "18px", fill: "#fff" }).setOrigin(0.5); // Adjust title
+        this.add.text(centerX, 30, "Branch 2: Gitopia", { fontSize: "20px", fill: "#fff" }).setOrigin(0.5); // Adjust title
         this.feedbackText = this.add
             .text(centerX, height - 30, "Explore... (Press T)", { fontSize: "12px", fill: "#aaa" })
             .setOrigin(0.5);

@@ -59,6 +59,7 @@ export default class Preloader extends Phaser.Scene {
     // this.load.image('map', 'assets/map.png');
     //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet("robot", "assets/EnemyRobot_Idle.png", { frameWidth: 32, frameHeight: 32 });
     // ... load all other assets
 
     // Tilemap (level2)
@@ -109,7 +110,12 @@ export default class Preloader extends Phaser.Scene {
           frameRate: 4,
           repeat: -1,
       });
-
+      this.anims.create({
+          key: "robot-idle",
+          frames: this.anims.generateFrameNumbers("robot", { start: 0, end: 3 }),
+          frameRate: 4, // 4 frames per second
+          repeat: -1, // loop forever
+      });
       this.scene.start("Level1"); //Start first level
   }
 }

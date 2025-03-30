@@ -17,8 +17,8 @@ export default class Level1 extends Phaser.Scene {
     // Initial state: Shadowy void with a torch
     // this.torch = this.add.image(100, 100, 'torch').setScale(0.5); // Example position/asset
 
-    this.add.text(250, 30, 'Level 1: The Forgotten Repository', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
-    this.feedbackText = this.add.text(200, 100, 'Press T to open terminal. Hint: clone the dungeon', { fontSize: '8px', fill: '#aaa' }).setOrigin(0.5);
+    this.add.text(240, 30, 'Area 1: Space', { fontSize: '20px', fill: '#fff' }).setOrigin(0.5);
+    this.feedbackText = this.add.text(240, 140, "Press T to open terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'", { fontSize: '13px', fill: '#aaa' }).setOrigin(0.5);
 
     // Listen for commands from the React Terminal via the global event emitter
     this.game.events.on('commandInput', this.handleCommand, this);
@@ -36,15 +36,14 @@ export default class Level1 extends Phaser.Scene {
     }
 
     console.log(`Level 1 received command: ${command}`);
-    const expectedCommand = 'git clone ancient-dungeon';
+    const expectedCommand = 'git clone gitopia';
 
     if (command.toLowerCase() === expectedCommand) {
       if (!this.isCloned) {
         this.isCloned = true;
-        this.feedbackText.setText('Success! The ancient dungeon reveals itself...');
         this.scene.start("Level2");
       } else {
-        this.feedbackText.setText('The dungeon is already cloned.');
+        this.feedbackText.setText('Incorrect command. Try "git clone gitopia".');
       }
     } else {
       this.feedbackText.setText(`Unknown command or incorrect syntax. Expected: ${expectedCommand}`);
