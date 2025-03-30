@@ -55,8 +55,9 @@ export default class Level4 extends Phaser.Scene {
 
 
     // Title text
-    this.add.text(centerX, 30, 'Level 4: The Final Merge', {
-      fontSize: '18px',
+    this.add.text(centerX, 30, 'Branch 4: The Base', {
+      fontSize: '16px',
+      fontFamily: "Minecraft",
       fill: '#fff'
     }).setOrigin(0.5);
 
