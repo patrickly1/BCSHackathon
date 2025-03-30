@@ -12,14 +12,19 @@ export default class Level1 extends Phaser.Scene {
 
       // Flag for robot interaction
       this.robotInteracted = false;
+      
+      
+
   }
 
   preload() {
     this.load.image('level1_bg', "assets/level/start/level1_bg.png");
     this.robotSound = this.sound.add("robot");
+    this.warpSound = this.sound.add("level-delay-sound");
   }
 
   create() {
+        this.warpSound.play();
       const { width, height } = this.scale;
       this.cameras.main.setBackgroundColor("#1a1a1a"); // Dark background
       this.add.image(width / 2, height / 2, "level1_bg");
@@ -136,6 +141,7 @@ export default class Level1 extends Phaser.Scene {
     if (command.toLowerCase() === expectedCommand) {
       if (!this.isCloned) {
         this.isCloned = true;
+
         this.scene.start("Level2");
       } else {
         this.feedbackText.setText('Incorrect command. Try "git clone gitopia".');

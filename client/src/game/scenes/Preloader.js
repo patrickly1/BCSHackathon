@@ -63,6 +63,7 @@ export default class Preloader extends Phaser.Scene {
     ]);
     this.load.audio("robot", "assets/sounds/Robot.wav");
     this.load.audio("level-delay-sound", "assets/sounds/level-delay-sound.wav");
+    
     this.load.audio("pickup-coin", "assets/sounds/level3/pickup-coin.wav");
     this.load.audio("alarm", "assets/sounds/level4/alarm.wav");
     this.load.audio("ship-sounds", "assets/sounds/level4/ship-sounds.wav");
@@ -162,7 +163,7 @@ export default class Preloader extends Phaser.Scene {
     if (!this.sound.get("bgm")) {
         this.musicManager.play("bgm");
     }
-
-      this.scene.start("Level4"); //Start first level
+    
+      this.scene.start("Level0"); //Start first level
   }
 }

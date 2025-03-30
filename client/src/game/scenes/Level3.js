@@ -42,10 +42,14 @@ export default class Level3 extends Phaser.Scene {
     // Ensure the "player" asset is loaded in your Preloader or here if needed
 
     this.robotSound = this.sound.add("robot");
+    this.pickupSound = this.sound.add("pickup-coin");
+    this.robotSound = this.sound.add("robot");
+    this.warpSound = this.sound.add("level-delay-sound");
   }
 
   create() {
       const player = GameManager.getPlayer();
+      this.warpSound.play();
       if (player.getLocation() !== "Level3") {
           player.setLocation("Level3");
       }
@@ -231,6 +235,7 @@ export default class Level3 extends Phaser.Scene {
       this.inventory.add(target);
       item.disableBody(true, true);
       this.setFeedback(`Success! Added ${target}.`);
+      this.pickupSound.play();
       this.updateStatusText();
       this.updateInstruction(); // Update instructions if needed
       return;
@@ -259,17 +264,15 @@ export default class Level3 extends Phaser.Scene {
 
     // --- Handle "git checkout base" ---
     if (action === 'git' && verb === 'checkout' && target === 'base') {
-      if (!this.commitDone) {
-        this.setFeedback('You must commit your resources first with: git commit -m "Collected resources"');
+        if (!this.commitDone) {
+            this.setFeedback('You must commit your resources first with: git commit -m "Collected resources"');
+            return;
+        }
+        this.checkoutDone = true;
+        this.setFeedback("Checked out base successfully! Level complete.");
+        this.updateInstruction(); // Update instruction if needed
+        this.scene.start("Level4"); // Transition to next level or scene
         return;
-      }
-      this.checkoutDone = true;
-      this.setFeedback("Checked out base successfully! Level complete.");
-      this.updateInstruction(); // Update instruction if needed
-      this.time.delayedCall(2000, () => {
-        this.scene.start('Level4'); // Transition to next level or scene
-      });
-      return;
     }
 
     this.setFeedback('Unknown command. Try: git add <resource>,\n git commit -m "Collected resources",\n or git checkout base.');
