@@ -28,6 +28,19 @@ export default class Level1 extends Phaser.Scene {
     // Listen for commands from the React Terminal via the global event emitter
     this.game.events.on('commandInput', this.handleCommand, this);
 
+
+    // Add collision
+    // Create a static group to hold collision zones
+
+    // Red Rectangle for debugging
+    const zone1 = this.add.rectangle(80, 285, 300, 65, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+    const zone2 = this.add.rectangle(160, 350, 150, 40, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+    this.physics.add.existing(zone1, true); // true = static body
+    this.physics.add.existing(zone2, true); // true = static body
+
+
+
+
     // Cleanup listener when scene is destroyed
     this.events.on('shutdown', () => {
       this.game.events.off('commandInput', this.handleCommand, this);
