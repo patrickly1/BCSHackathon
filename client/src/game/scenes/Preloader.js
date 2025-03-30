@@ -57,11 +57,16 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
     // ... load all other assets
 
-    // Tilemap
+    // Tilemap (level2)
     this.load.image("tiles2", 'assets/level/tiles.png')
     this.load.tilemapTiledJSON("map", 'assets/level/tilemap.tmj')
-  }
 
+    // Tilemap (level3)
+    this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
+    this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
+    this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
+
+  }
   create() {
     // Assets loaded, start the first level
     console.log("Preloader complete. Starting Level 1.");
