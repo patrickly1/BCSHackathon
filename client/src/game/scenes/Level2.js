@@ -35,22 +35,21 @@ export default class Level2 extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        this.add.image(width/2, height/2,'level2_bg');
+        this.add.image(width / 2, height / 2, "level2_bg");
         const player = GameManager.getPlayer();
-        if (player.getLocation() !== 'Level2') {
-            player.setLocation('Level2');
-            }
+        if (player.getLocation() !== "Level2") {
+            player.setLocation("Level2");
+        }
 
         // Update the location in the App (React side)
         if (this.game.reactSetCurrentLocation) {
-            this.game.reactSetCurrentLocation('Level2');
+            this.game.reactSetCurrentLocation("Level2");
         }
 
         const centerX = width / 2;
 
         const robotX = centerX;
         const robotY = height - 80;
-    
 
         this.robotInstruction = this.add
             .text(
@@ -81,6 +80,7 @@ export default class Level2 extends Phaser.Scene {
 
         // Spawn the robot sprite
         this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
+
         this.robot.anims.play("robot-idle");
         this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
 
@@ -104,13 +104,17 @@ export default class Level2 extends Phaser.Scene {
         // --- *** END CHANGE *** ---
 
         // --- UI Text ---
-        this.add.text(centerX, 30, "Branch 2: Gitopia", { fontSize: "16px", fontFamily: "Minecraft", fill: "#fff" }).setOrigin(0.5); // Adjust title
+        this.add
+            .text(centerX, 30, "Branch 2: Gitopia", { fontSize: "16px", fontFamily: "Minecraft", fill: "#fff" })
+            .setOrigin(0.5); // Adjust title
         this.feedbackText = this.add
             .text(centerX, height - 30, "Explore... (Press T)", { fontSize: "12px", fill: "#aaa" })
             .setOrigin(0.5);
 
         // --- Player ---
         this.player = this.physics.add.sprite(width * 0.5, height * 0.5, "player").setScale(2.5);
+        this.player.body.setSize(6, 8); // width, height
+        this.player.body.setOffset(3, 8); // center it if neededw
         this.player.setCollideWorldBounds(true);
 
         // Add Ship Collision
@@ -121,9 +125,7 @@ export default class Level2 extends Phaser.Scene {
         const squareFive = this.add.rectangle(170, 350, 50, 50, 0xff0000, 0);
         const squareSix = this.add.rectangle(300, 250, 50, 50, 0xff0000, 0);
 
-
-
-        this.physics.add.existing(squareOne, true); 
+        this.physics.add.existing(squareOne, true);
         this.physics.add.collider(this.player, squareOne);
         this.physics.add.existing(squareTwo, true);
         this.physics.add.collider(this.player, squareTwo);
@@ -135,7 +137,6 @@ export default class Level2 extends Phaser.Scene {
         this.physics.add.collider(this.player, squareFive);
         this.physics.add.existing(squareSix, true);
         this.physics.add.collider(this.player, squareSix);
-
 
         // --- Input ---
         // Still add keys so they are ready when input is enabled

@@ -43,122 +43,132 @@ export default class Level3 extends Phaser.Scene {
   }
 
   create() {
-    const player = GameManager.getPlayer();
-    if (player.getLocation() !== "Level3") {
-      player.setLocation("Level3");
-    }
-
-    // Update the location in the App (React side)
-    if (this.game.reactSetCurrentLocation) {
-      this.game.reactSetCurrentLocation("Level3");
-    }
-    const { width, height } = this.scale;
-    this.cameras.main.setBackgroundColor("#3d3d3d"); // Dungeon floor color
-
-    // Setup tilemap
-    const map = this.add.tilemap("levelThreeMap");
-    const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles");
-    const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles");
-    const floorLayer = map.createLayer("Floor", mainTiles);
-    const obstacleLayer = map.createLayer("Obstacles", decorativeTiles);
-
-    // --- Setup UI Text ---
-    // Instruction text: initially "Collect resources"
-    this.instructionText = this.add.text(width / 2, height - 90, "Collect iron and copper to craft", {
-      fontSize: "12px",
-      fill: "#fff",
-      fontFamily: "Minecraft"
-    }).setOrigin(0.5);
-
-    // Feedback text for command responses
-    this.feedbackText = this.add.text(width / 2, height - 50, "", {
-      fontSize: "12px",
-      fill: "#fff",
-    }).setOrigin(0.5);
-
-    this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
-    this.stagedText = this.add.text(10, 30, "Staged: ", { fontSize: "8px", fill: "#fff" });
-
-    // --- Setup Player ---
-    this.player = this.physics.add.sprite(150, 310, "player").setScale(2.5);
-    this.player.setCollideWorldBounds(true);
-    this.player.setDepth(10); // Ensure player is drawn above items
-
-    // --- Setup Items ---
-    this.itemsToCollect = this.physics.add.group();
-
-    // Create and position resource items for "copper" and "iron"
-    const copper = this.itemsToCollect
-      .create(width * 0.9, height * 0.2, "copper")
-      .setData("itemName", "copper")
-      .setScale(0.15);
-    const iron = this.itemsToCollect
-      .create(width * 0.6, height * 0.4, "iron")
-      .setData("itemName", "iron")
-      .setScale(0.15);
-
-    // Do NOT add an automatic overlap callback—items remain until the player issues the command
-
-    // --- Setup Collision ---
-    obstacleLayer.setCollisionByProperty({ collides: true });
-    this.physics.add.collider(this.player, obstacleLayer);
-
-    // --- Setup Input ---
-    this.keys = this.input.keyboard.addKeys("W,A,S,D");
-    this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
-
-    // Listen for commands from the React Terminal
-    this.game.events.on("commandInput", this.handleCommand, this);
-
-    // Cleanup listener when scene is destroyed
-    this.events.on("shutdown", () => {
-      this.game.events.off("commandInput", this.handleCommand, this);
-      this.inventory.clear();
-      this.stagedItems.clear();
-    });
-
-    this.updateStatusText();
-
-    // Setup robot instructions and sprite (optional)
-    const robotX = width * 0.5;
-    const robotY = width * 0.5;
-    this.robotInstruction = this.add.text(
-      robotX,
-      robotY - height * 0.2,
-      'We’ve found some scattered parts nearby—perfect for repairing the ship!\n\nTo collect items into your staging area, use git add <resource>.\nOnce you’ve gathered everything, save your progress with git commit -m "Collected resources".\nThen return to base using git checkout base.',
-      {
-        fontSize: "10px",
-        fill: "#00ffcc",
-        stroke: "#003344",
-        strokeThickness: 0,
-        align: "left",
-        backgroundColor: "#11111188", // Dark, metallic background
-        padding: { x: 12, y: 8 },
-        wordWrap: { width: 250, useAdvancedWrap: true },
-        shadow: {
-          offsetX: 3,
-          offsetY: 3,
-          color: "#001122",
-          blur: 2,
-          stroke: false,
-          fill: true,
-        },
-        lineSpacing: 4,
+      const player = GameManager.getPlayer();
+      if (player.getLocation() !== "Level3") {
+          player.setLocation("Level3");
       }
-    ).setOrigin(0.5);
 
-    // Spawn the robot sprite
-    this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
-    this.robot.anims.play("robot-idle");
-    this.robot.setOrigin(0.5);
+      // Update the location in the App (React side)
+      if (this.game.reactSetCurrentLocation) {
+          this.game.reactSetCurrentLocation("Level3");
+      }
+      const { width, height } = this.scale;
+      this.cameras.main.setBackgroundColor("#3d3d3d"); // Dungeon floor color
 
-    this.robotAlert = this.add.text(robotX, robotY - 25, "!", {
-      fontSize: "20px",
-      fontFamily: "Minecraft",
-      color: "#ff0000",
-      stroke: "#000000",
-      strokeThickness: 3,
-    }).setOrigin(0.5);
+      // Setup tilemap
+      const map = this.add.tilemap("levelThreeMap");
+      const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles");
+      const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles");
+      const floorLayer = map.createLayer("Floor", mainTiles);
+      const obstacleLayer = map.createLayer("Obstacles", decorativeTiles);
+
+      // --- Setup UI Text ---
+      // Instruction text: initially "Collect resources"
+      this.instructionText = this.add
+          .text(width / 2, height - 90, "Collect iron and copper to craft", {
+              fontSize: "12px",
+              fill: "#fff",
+              fontFamily: "Minecraft",
+          })
+          .setOrigin(0.5);
+
+      // Feedback text for command responses
+      this.feedbackText = this.add
+          .text(width / 2, height - 50, "", {
+              fontSize: "12px",
+              fill: "#fff",
+          })
+          .setOrigin(0.5);
+
+      this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
+      this.stagedText = this.add.text(10, 30, "Staged: ", { fontSize: "8px", fill: "#fff" });
+
+      // --- Setup Player ---
+      this.player = this.physics.add.sprite(150, 310, "player").setScale(2.5);
+      this.player.body.setSize(6, 8); // width, height
+      this.player.body.setOffset(3, 8); // center it if needed
+      this.player.setCollideWorldBounds(true);
+      this.player.setDepth(10); // Ensure player is drawn above items
+
+      // --- Setup Items ---
+      this.itemsToCollect = this.physics.add.group();
+
+      // Create and position resource items for "copper" and "iron"
+      const copper = this.itemsToCollect
+          .create(width * 0.9, height * 0.2, "copper")
+          .setData("itemName", "copper")
+          .setScale(0.15);
+      const iron = this.itemsToCollect
+          .create(width * 0.6, height * 0.4, "iron")
+          .setData("itemName", "iron")
+          .setScale(0.15);
+
+      // Do NOT add an automatic overlap callback—items remain until the player issues the command
+
+      // --- Setup Collision ---
+      obstacleLayer.setCollisionByProperty({ collides: true });
+      this.physics.add.collider(this.player, obstacleLayer);
+
+      // --- Setup Input ---
+      this.keys = this.input.keyboard.addKeys("W,A,S,D");
+      this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
+
+      // Listen for commands from the React Terminal
+      this.game.events.on("commandInput", this.handleCommand, this);
+
+      // Cleanup listener when scene is destroyed
+      this.events.on("shutdown", () => {
+          this.game.events.off("commandInput", this.handleCommand, this);
+          this.inventory.clear();
+          this.stagedItems.clear();
+      });
+
+      this.updateStatusText();
+
+      // Setup robot instructions and sprite (optional)
+      const robotX = width * 0.5;
+      const robotY = width * 0.5;
+      this.robotInstruction = this.add
+          .text(
+              robotX,
+              robotY - height * 0.2,
+              'We’ve found some scattered parts nearby—perfect for repairing the ship!\n\nTo collect items into your staging area, use git add <resource>.\nOnce you’ve gathered everything, save your progress with git commit -m "Collected resources".\nThen return to base using git checkout base.',
+              {
+                  fontSize: "10px",
+                  fill: "#00ffcc",
+                  stroke: "#003344",
+                  strokeThickness: 0,
+                  align: "left",
+                  backgroundColor: "#11111188", // Dark, metallic background
+                  padding: { x: 12, y: 8 },
+                  wordWrap: { width: 250, useAdvancedWrap: true },
+                  shadow: {
+                      offsetX: 3,
+                      offsetY: 3,
+                      color: "#001122",
+                      blur: 2,
+                      stroke: false,
+                      fill: true,
+                  },
+                  lineSpacing: 4,
+              }
+          )
+          .setOrigin(0.5);
+
+      // Spawn the robot sprite
+      this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
+      this.robot.anims.play("robot-idle");
+      this.robot.setOrigin(0.5);
+
+      this.robotAlert = this.add
+          .text(robotX, robotY - 25, "!", {
+              fontSize: "20px",
+              fontFamily: "Minecraft",
+              color: "#ff0000",
+              stroke: "#000000",
+              strokeThickness: 3,
+          })
+          .setOrigin(0.5);
   }
 
   update(time, delta) {
