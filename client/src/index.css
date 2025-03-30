@@ -71,3 +71,10 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+canvas {
+  display: block;
+  width: 100vh;
+  height: 100vh;
+  image-rendering: pixelated;
+}
