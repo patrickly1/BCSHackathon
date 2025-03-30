@@ -34,7 +34,7 @@ export default class Level1 extends Phaser.Scene {
         .text(
             240,
             140,
-            "Press T to open terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
+            "Press T to open terminal.\n\nPres ESC to close terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
             { fontSize: "16px", fontFamily: "Minecraft", fill: "#aaa" }
         )
         .setOrigin(0.5);
