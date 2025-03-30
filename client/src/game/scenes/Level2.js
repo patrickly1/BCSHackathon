@@ -34,7 +34,6 @@ export default class Level2 extends Phaser.Scene {
         this.load.image('level2_bg',"assets/level/crashsite/level2_bg.png");
 
         this.robotSound = this.sound.add("robot");
-        this.robotSound = this.sound.add("robot");
         this.warpSound = this.sound.add("level-delay-sound");
     }
 
