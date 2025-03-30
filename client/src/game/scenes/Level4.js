@@ -32,9 +32,97 @@ export default class Level4 extends Phaser.Scene {
   }
 
   create() {
-      const player = GameManager.getPlayer();
-      if (player.getLocation() !== "Level4") {
-          player.setLocation("Level4");
+    const player = GameManager.getPlayer();
+    if (player.getLocation() !== "Level4") {
+      player.setLocation("Level4");
+    }
+    // Update the location in the App (React side)
+    if (this.game.reactSetCurrentLocation) {
+      this.game.reactSetCurrentLocation("Level4");
+    }
+    const { width, height } = this.scale;
+    const centerX = width / 2;
+
+    // Set a dark background for a final, tense feel
+    this.cameras.main.setBackgroundColor("#1a1a1a");
+
+    // Setup tilemap
+    const map = this.add.tilemap("levelFourMap");
+    const mainTiles = map.addTilesetImage("tiles", "baseTiles");
+    const decorationTiles = map.addTilesetImage("TileSet v1.0", "decorationTiles");
+    const computerTile = map.addTilesetImage("computer_terminal", "computerTile");
+
+    const floorLayer = map.createLayer("Floor", mainTiles);
+    const wallLayer = map.createLayer("Walls", mainTiles);
+    const decorationLayer = map.createLayer("decorations", decorationTiles);
+    const computerLayer = map.createLayer("computer", computerTile);
+
+    // Title text
+    this.add.text(centerX, 30, "Branch 4: The Base", {
+      fontSize: "16px",
+      fontFamily: "Minecraft",
+      fill: "#fff",
+    }).setOrigin(0.5);
+
+    // Create feedback text for command responses
+    this.feedbackText = this.add.text(centerX, height - (height * 0.15), "", {
+      fontSize: "12px",
+      fill: "#fff",
+    }).setOrigin(0.5);
+
+    // Create instruction text that is always visible.
+    this.instructionText = this.add.text(centerX, height - (height * 0.2), "Stash your progress before anything bad happens", {
+      fontSize: "12px",
+      fill: "#fff",
+      fontFamily: "Minecraft"
+    }).setOrigin(0.5);
+
+    // Create the player sprite (for movement only)
+    this.player = this.physics.add.sprite(centerX, height - 80, "player").setScale(2.5);
+    this.player.setCollideWorldBounds(true);
+
+    // --- Setup Collision ---
+    wallLayer.setCollisionByProperty({ collides: true });
+    decorationLayer.setCollisionByProperty({ collides: true });
+    this.physics.add.collider(this.player, wallLayer);
+    this.physics.add.collider(this.player, decorationLayer);
+
+    // Setup WASD input for movement
+    this.keys = this.input.keyboard.addKeys("W,A,S,D");
+    this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
+
+    // Listen for command input events
+    this.game.events.on("commandInput", this.handleCommand, this);
+
+    // Terminal toggle: disable Phaser keyboard input when the terminal is open
+    this.game.events.on("terminalToggled", this.handleTerminalToggle, this);
+    this.input.keyboard.enabled = true;
+
+    const robotX = width * 0.3;
+    const robotY = height * 0.7;
+
+    this.robotInstruction = this.add.text(
+      robotX,
+      robotY - height * 0.3,
+      "You’re back at base with everything you collected from the mine.\n\nBefore merging, stash any rare items using 'git stash' to keep them safe.\n\nNow run 'git merge mine' to bring your work into the project.\n\nThen walk over to the spaceship—it’s ready for repairs.\n\nPush your updates to mission control using 'git push', and prepare for launch.",
+      {
+        fontSize: "10px",
+        fill: "#00ffcc",
+        stroke: "#003344",
+        strokeThickness: 0,
+        align: "left",
+        backgroundColor: "#11111188", // Dark, metallic background
+        padding: { x: 12, y: 8 },
+        wordWrap: { width: 250, useAdvancedWrap: true },
+        shadow: {
+          offsetX: 3,
+          offsetY: 3,
+          color: "#001122",
+          blur: 2,
+          stroke: false,
+          fill: true,
+        },
+        lineSpacing: 4,
       }
       // Update the location in the App (React side)
       if (this.game.reactSetCurrentLocation) {
@@ -292,7 +380,7 @@ export default class Level4 extends Phaser.Scene {
         return;
       }
     }
-    this.setFeedback("Unknown command. Try: 'git stash', 'git merge mine', 'git reset', or 'git push'.");
+    this.setFeedback("Unknown command. Try: 'git stash', 'git merge mine',\n'git reset', or 'git push'.");
   }
 
   setFeedback(message) {
