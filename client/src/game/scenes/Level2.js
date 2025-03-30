@@ -183,62 +183,64 @@ export default class Level2 extends Phaser.Scene { // Adjust class name per leve
 
     // ... handleCommand() ... (Keep existing, ensure scene transition is correct)
     handleCommand(command) {
-        if (!this.scene.isActive() || this.checkedOut) { /* ... */ return; }
+        if (!this.scene.isActive() || this.checkedOut) return;
+    
         console.log(`Level 2 received command: ${command}`);
         const parts = command.trim().toLowerCase().split(' ');
-        const action = parts[0]; const verb = parts[1]; const arg = parts[2];
-
+        const action = parts[0];
+        const verb = parts[1];
+        const arg = parts[2];
+    
         if (action === 'git' && verb === 'branch' && arg) {
             if (arg === REQUIRED_BRANCH_NAME) {
                 if (!this.branchCreated) {
                     this.branchCreated = true;
                     this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' created! Now switch to it.`);
-                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`); }
-            } else { this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`); }
+                } else {
+                    this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`);
+                }
+            } else {
+                this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`);
+            }
             return;
         }
-      
-       if (action === 'git' && verb === 'checkout' && arg) {
-             if (arg === REQUIRED_BRANCH_NAME) {
+    
+        if (action === 'git' && verb === 'checkout' && arg) {
+            if (arg === REQUIRED_BRANCH_NAME) {
                 if (this.branchCreated) {
                     if (!this.checkedOut) {
                         this.checkedOut = true;
                         this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
                         this.revealPassage();
                         this.time.delayedCall(2500, () => {
-                            // --- MAKE SURE this transitions to the correct NEXT level ---
-                            this.scene.start('Level3'); // Or Level4, Level5 etc.
-                            // --- END ---
+                            this.scene.start('Level3'); // Update as needed
                         });
-                    } else { this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`); }
-                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`); }
-            } else { this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`); }
-         const player = GameManager.getPlayer();
-        if (!player.getInventory().includes(target)) {
-            this.setFeedback(`You haven't collected the ${target} yet!`);
+                    } else {
+                        this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`);
+                    }
+                } else {
+                    this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`);
+                }
+            } else {
+                this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`);
+            }
             return;
         }
+    
         this.setFeedback(`Unknown command. Try 'git branch ...' or 'git checkout ...'`);
     }
-
-
-    // ... revealPassage() ... (Keep existing)
-     revealPassage() {
-        this.cameras.main.setBackgroundColor('#34495e');
-        this.add.text(this.scale.width / 2, this.scale.height / 2, 'Passage Opened!', { fontSize: '20px', fill: '#0f0' }).setOrigin(0.5);
-    }
-      
-    // ... setFeedback() ... (Keep existing)
+    
     setFeedback(message) {
-         if (this.feedbackText && this.feedbackText.active) {
-             this.feedbackText.setText(message);
-         }
+        if (this.feedbackText && this.feedbackText.active) {
+            this.feedbackText.setText(message);
+        }
+    }
+    
     updateStatusText() {
-       // Use Array.from() to convert Set to Array for joining
-       const player = GameManager.getPlayer();
-       const collectedList = player.getInventory().join(', ') || 'None';
-       const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-       this.collectedText.setText(`Collected: ${collectedList}`);
-       this.stagedText.setText(`Staged: ${stagedList}`);
+        const player = GameManager.getPlayer();
+        const collectedList = player.getInventory().join(', ') || 'None';
+        const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
+        this.collectedText?.setText(`Collected: ${collectedList}`);
+        this.stagedText?.setText(`Staged: ${stagedList}`);
     }
 }
