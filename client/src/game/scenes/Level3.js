@@ -1,223 +1,206 @@
+// client/src/game/scenes/Level3.js
 import Phaser from 'phaser';
-import GameManager from '../GameManager';
-import PlayerController from '../PlayerController';
 
-const PLAYER_SPEED = 200; // Pixels per second
-const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
-const player = GameManager.getPlayer();
+const PLAYER_SPEED = 200;
+// Now, the required items are "copper" and "iron"
+const REQUIRED_ITEMS = ['copper', 'iron'];
 
 export default class Level3 extends Phaser.Scene {
-    constructor() {
-        super('Level3');
+  constructor() {
+    super('Level3');
 
-        // Scene state
-        this.player = GameManager.getPlayer();
-        this.keys = null; // To store keyboard keys
-        this.itemsToCollect = null; // Group for collectable items
-        this.anvil = null;
-        this.feedbackText = null;
-        console.log(`inital test: ${player.getLocation()}`);
+    // Scene state
+    this.player = null;
+    this.keys = null;
+    this.itemsToCollect = null;
+    this.feedbackText = null;
+    this.collectedText = null;
+    this.stagedText = null;
 
+    // Game logic state
+    this.inventory = new Set(); // Items the player has picked up (via command)
+    this.stagedItems = new Set(); // Items successfully 'git add'-ed
 
-        // Game logic state
-        // this.inventory = new Set(); // Items the player has picked up
-        this.stagedItems = new Set(); // Items successfully 'git add'-ed
+    // State flags for commit and checkout sequence
+    this.commitDone = false;
+    this.checkoutDone = false;
+  }
+
+  preload() {
+    // Assets should be preloaded by your Preloader.
+    // If not, you can load here:
+    this.load.image('copper', 'assets/copper.png');
+    this.load.image('iron', 'assets/iron.png');
+    // this.load.image('player', 'assets/player.png');
+    // this.load.tilemapTiledJSON("levelThreeMap", "assets/levelThreeMap.json");
+    // this.load.image("mainTiles", "assets/mainTiles.png");
+    // this.load.image("decorativeTiles", "assets/decorativeTiles.png");
+  }
+
+  create() {
+    const { width, height } = this.scale;
+    this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
+
+    // Setup tilemap (if used in this level)
+    const map = this.add.tilemap("levelThreeMap");
+    const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles");
+    const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles");
+    const floorLayer = map.createLayer("Floor", mainTiles);
+    const obstacleLayer = map.createLayer("Obstacles", decorativeTiles);
+
+    // --- Setup UI Text ---
+    this.add.text(250, 30, 'Level 3: The Resource Mine', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
+    this.feedbackText = this.add.text(
+      250,
+      100,
+      'Collect the resources by getting near them and using git add <resource>.\nThen commit with: git commit -m "Collected resources"\nAnd checkout base with: git checkout base',
+      { fontSize: '12px', fill: '#aaa', align: 'center' }
+    ).setOrigin(0.5);
+    this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
+    this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
+
+    // --- Remove the anvil (it's no longer needed) ---
+
+    // --- Setup Player ---
+    this.player = this.physics.add.sprite(100, 450, 'player');
+    this.player.setCollideWorldBounds(true);
+    this.player.setDepth(10); // Ensure player is drawn above items
+
+    // --- Setup Items ---
+    this.itemsToCollect = this.physics.add.group();
+
+    // Create and position resource items for "copper" and "iron"
+    const copper = this.itemsToCollect.create(width * 0.9, height * 0.2, 'copper').setData('itemName', 'copper').setScale(0.15);
+    const iron = this.itemsToCollect.create(width * 0.6, height * 0.4, 'iron').setData('itemName', 'iron').setScale(0.15);
+
+    // Do NOT add an automatic overlap callback—items remain until the player issues the command
+
+    // --- Setup Collision ---
+    obstacleLayer.setCollisionByProperty({ collides: true });
+    this.physics.add.collider(this.player, obstacleLayer);
+
+    // --- Setup Input ---
+    this.keys = this.input.keyboard.addKeys('W,A,S,D');
+
+    // Listen for commands from the React Terminal
+    this.game.events.on('commandInput', this.handleCommand, this);
+
+    // Cleanup listener when scene is destroyed
+    this.events.on('shutdown', () => {
+      console.log('Level 3 shutdown, removing listener.');
+      this.game.events.off('commandInput', this.handleCommand, this);
+      this.inventory.clear();
+      this.stagedItems.clear();
+    });
+
+    this.updateStatusText();
+  }
+
+  update(time, delta) {
+    if (!this.player || !this.keys) return;
+
+    this.player.setVelocity(0);
+
+    if (this.keys.A.isDown) {
+      this.player.setVelocityX(-PLAYER_SPEED);
+    } else if (this.keys.D.isDown) {
+      this.player.setVelocityX(PLAYER_SPEED);
+    }
+    if (this.keys.W.isDown) {
+      this.player.setVelocityY(-PLAYER_SPEED);
+    } else if (this.keys.S.isDown) {
+      this.player.setVelocityY(PLAYER_SPEED);
+    }
+    this.player.body.velocity.normalize().scale(PLAYER_SPEED);
+  }
+
+  handleCommand(command) {
+    if (!this.scene.isActive()) return;
+    console.log(`Level 3 received command: ${command}`);
+    
+    const parts = command.trim().split(' ');
+    const action = parts[0].toLowerCase();
+    const verb = parts[1] ? parts[1].toLowerCase() : null;
+    const target = parts[2] ? parts[2].toLowerCase() : null;
+
+    // --- Handle "git add" ---
+    if (action === 'git' && verb === 'add' && target) {
+      if (!REQUIRED_ITEMS.includes(target)) {
+        this.setFeedback(`Cannot add '${target}'. Only copper and iron can be added.`);
+        return;
+      }
+      if (this.stagedItems.has(target)) {
+        this.setFeedback(`The ${target} is already added.`);
+        return;
+      }
+      // Find the item in the scene by its itemName
+      const item = this.itemsToCollect.getChildren().find(it => it.getData('itemName') === target);
+      if (!item) {
+        this.setFeedback(`There is no ${target} available.`);
+        return;
+      }
+      // Check if the player is near the item (within 50 pixels)
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, item.x, item.y);
+      const threshold = 50; // pixels
+      if (dist > threshold) {
+        this.setFeedback(`You are too far from the ${target}. Get closer to add it.`);
+        return;
+      }
+      // Success: mark item as staged and add to inventory
+      this.stagedItems.add(target);
+      this.inventory.add(target);
+      item.disableBody(true, true);
+      this.setFeedback(`Success! Added ${target}.`);
+      this.updateStatusText();
+      return;
     }
 
-    preload() {
-        // Assets should already be loaded by Preloader.js
-        // If you need scene-specific assets, load them here.
-    }
-
-    create() {
-        if (this.scene.isActive('Level1')) {
-            console.log('💣 Shutting down Level1 from inside Level3');
-            this.scene.stop('Level1');
+    // --- Handle "git commit -m 'Collected resources'" ---
+    if (action === 'git' && verb === 'commit') {
+      if (parts[2] && parts[2].toLowerCase() === '-m') {
+        const commitMessage = parts.slice(3).join(' ').replace(/["']/g, '').toLowerCase();
+        if (commitMessage === 'collected resources') {
+          if (this.stagedItems.size !== REQUIRED_ITEMS.length) {
+            this.setFeedback("Not all resources have been added yet!");
+          } else {
+            this.commitDone = true;
+            this.setFeedback("Commit successful! Now checkout base with: git checkout base");
           }
-        console.log(`inital test: ${player.getLocation()}`);
-
-        if (player.getLocation() !== 'Level3') {
-            console.log(`inital test: ${player.getLocation()}`);
-            player.setLocation('Level3');
-            console.log(`after test: ${player.getLocation()}`);
+        } else {
+          this.setFeedback('Incorrect commit message. Use: git commit -m "Collected resources"');
         }
-
-        // Update the location in the App (React side)
-        if (this.game.reactSetCurrentLocation) {
-            this.game.reactSetCurrentLocation('Level3');
-        }
-
-        const { width, height } = this.scale;
-        const centerX = width / 2;
-        
-        this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
-
-
-        // Setup tilemap
-        const map = this.add.tilemap("levelThreeMap");
-        const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles")
-        const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles")
-        const floorLayer = map.createLayer("Floor", mainTiles)
-        const obstacleLayer = map.createLayer("Obstacles", decorativeTiles)
-        const mushroomLayer = map.createLayer("Foliage", decorativeTiles)
-
-        // --- Setup UI Text ---
-        this.add.text(250, 30, 'Level 3: The Blacksmith’s Anvil', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
-        this.feedbackText = this.add.text(250, 100, 'Collect the sword parts (WASD to move). Press T for terminal.', { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
-        this.collectedText = this.add.text(10, 10, 'Collected: ', { fontSize: '8px', fill: '#fff' });
-        this.stagedText = this.add.text(10, 30, 'Staged: ', { fontSize: '8px', fill: '#fff' });
-
-        // --- Setup Anvil ---
-        this.anvil = this.add.image(width * 0.5, height * 0.5, 'anvil').setScale(1.5); // Position the anvil centrally
-
-        // --- Setup Player ---
-        this.player = this.physics.add.sprite(centerX, 240, 'player').setScale(2.5); // Starting position
-        this.player.setCollideWorldBounds(true); // Keep player within game bounds
-        // Optional: Set player size if sprite needs adjusting
-        // this.player.setSize(20, 32).setOffset(6, 16);
-
-        // --- Setup Items ---
-        this.itemsToCollect = this.physics.add.group();
-
-        // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(width * 0.4, height * 0.2, 'sword_blade').setData('itemName', 'blade');
-        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, 'sword_hilt').setData('itemName', 'hilt');
-        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, 'gem').setData('itemName', 'gem');
-
-        // --- Setup Physics ---
-        // Add overlap detection between player and items
-        this.physics.add.overlap(this.player, this.itemsToCollect, this.collectItem, null, this);
-
-
-        // --- Setup Collision ---
-        // Add collisions
-        obstacleLayer.setCollisionByProperty({ collides: true });
-        this.physics.add.collider(this.player, obstacleLayer);
-
-        // --- Setup Input ---
-        // Basic WASD controls
-        this.keys = this.input.keyboard.addKeys('W,A,S,D');
-
-        // Listen for commands from the React Terminal
-        this.game.events.on('commandInput', this.handleCommand, this);
-
-        // Cleanup listener when scene is destroyed
-        this.events.on('shutdown', () => {
-            console.log('Level 2 shutdown, removing listener.');
-            this.game.events.off('commandInput', this.handleCommand, this);
-            // Reset state for potential restarts if needed (or handle in init/create)
-            this.stagedItems.clear();
-        });
-
-        // Initial state update
-        this.updateStatusText();
-
-
-
-        // Player controller
-        this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
+      } else {
+        this.setFeedback('Invalid commit command. Use: git commit -m "Collected resources"');
+      }
+      return;
     }
 
-    update(time, delta) {
-        if (!this.input.keyboard.enabled) return;
-        this.playerController.update();
+    // --- Handle "git checkout base" ---
+    if (action === 'git' && verb === 'checkout' && target === 'base') {
+      if (!this.commitDone) {
+        this.setFeedback('You must commit your resources first with: git commit -m "Collected resources"');
+        return;
+      }
+      this.checkoutDone = true;
+      this.setFeedback("Checked out base successfully! Level complete.");
+      this.time.delayedCall(2000, () => {
+        // Transition to the next level or final scene.
+        this.scene.start('Level4'); // Replace with your next scene key if needed.
+      });
+      return;
     }
 
-    collectItem(playerSprite, item) {
-        const itemName = item.getData('itemName');
-        // resets here.
-        player.setLocation('Level3');
-        console.log(`collect start: ${player.getLocation()}`);
-        const currentItems = player.getInventory();
-        console.log(`after setup: ${player.getLocation()}`);
-    
-        if (!currentItems.includes(itemName)) {
-            player.addItem(itemName);
-            console.log(`after add: ${player.getLocation()}`);
-            console.log(`Collected: ${itemName}`);
-            console.log(`Location: ${player.getLocation()}`);
+    this.setFeedback('Unknown command. Try: git add <resource>, git commit -m "Collected resources", or git checkout base.');
+  }
 
-            this.setFeedback(`Collected ${itemName}! Find the others.`);
-    
-            item.disableBody(true, true);
-            this.updateStatusText();
-        }
-    }
+  setFeedback(message) {
+    this.feedbackText.setText(message);
+  }
 
-    handleCommand(command) {
-        if (!this.scene.isActive()) {
-            return; // Don't process if scene is not active
-        }
-        console.log(`Level 3 received command: ${command}`);
-
-        const parts = command.trim().toLowerCase().split(' '); // Split command into parts
-        const action = parts[0];
-        const verb = parts[1];
-        const target = parts[2]; // The item name
-
-        if (action !== 'git' || verb !== 'add' || !target) {
-            this.setFeedback(`Invalid command format. Use: git add <item_name>`);
-            return;
-        }
-
-        // Check if the target item is one of the required ones
-        if (!REQUIRED_ITEMS.includes(target)) {
-            this.setFeedback(`Cannot add '${target}'. It's not part of the sword.`);
-            return;
-        }
-
-        // Check if the player has collected the item
-        if (!GameManager.getPlayer().getInventory().includes(target)) {
-            this.setFeedback(`You haven't collected the ${target} yet!`);
-            return;
-        }
-
-        // Check if the item has already been staged
-        if (this.stagedItems.has(target)) {
-            this.setFeedback(`The ${target} is already on the anvil (staged).`);
-            return;
-        }
-
-        // --- Success: Stage the item ---
-        this.stagedItems.add(target);
-        this.setFeedback(`Success! Added ${target} to the anvil.`);
-        console.log(`Staged: ${target}`);
-        this.updateStatusText();
-
-        // --- Check for Win Condition ---
-        if (this.checkWinCondition()) {
-            this.setFeedback('All parts staged! Ready to forge. Proceeding...');
-            this.time.delayedCall(2500, () => {
-                this.scene.start('Level4'); // Move to the next level
-            });
-        }
-    }
-
-    checkWinCondition() {
-        // Check if the number of staged items matches the required number
-        if (this.stagedItems.size !== REQUIRED_ITEMS.length) {
-            return false;
-        }
-        // Optionally, double-check if *all* required items are present
-        return REQUIRED_ITEMS.every(item => this.stagedItems.has(item));
-    }
-
-    setFeedback(message) {
-        this.feedbackText.setText(message);
-        // Optional: Clear feedback after a delay
-        // if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-        // this.feedbackTimeout = setTimeout(() => {
-        //     if (this.feedbackText.active) { // Check if text object still exists
-        //       this.feedbackText.setText('Use terminal (T) to "git add <item_name>"');
-        //     }
-        // }, 4000);
-    }
-
-    updateStatusText() {
-        const player = GameManager.getPlayer();
-        const collectedList = player.getInventory().join(', ') || 'None';
-        const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-        this.collectedText.setText(`Collected: ${collectedList}`);
-        this.stagedText.setText(`Staged: ${stagedList}`);
-    }
+  updateStatusText() {
+    const collectedList = Array.from(this.inventory).join(', ') || 'None';
+    const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
+    this.collectedText.setText(`Collected: ${collectedList}`);
+    this.stagedText.setText(`Staged: ${stagedList}`);
+  }
 }
