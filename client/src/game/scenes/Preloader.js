@@ -70,8 +70,7 @@ export default class Preloader extends Phaser.Scene {
     const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
     console.log(`Preloader complete. Starting ${savedLocation}.`);
     this.scene.start(savedLocation);
-    
-    console.log("Preloader complete. Starting Level 1.");
+
 
       //Player animations
       this.anims.create({
