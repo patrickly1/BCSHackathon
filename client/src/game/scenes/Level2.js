@@ -3,7 +3,7 @@ import GameManager from "../GameManager";
 import PlayerController from "../PlayerController";
 
 const PLAYER_SPEED = 160;
-const REQUIRED_BRANCH_NAME = "secret-tunnel";
+const REQUIRED_BRANCH_NAME = "mine";
 
 export default class Level2 extends Phaser.Scene {
     // Adjust class name per level
@@ -49,30 +49,33 @@ export default class Level2 extends Phaser.Scene {
         this.robotInstruction = this.add
             .text(
                 robotX,
-                robotY - 50,
-                "Welcome, Commander, to our Hackathon Adventure!\nWASD to navigate, T to open the terminal\nWe’ve crash-landed on an uncharted planet...\nWe need to gather critical resources to survive\nLet’s checkout that mysterious tunnel ahead—it might hold the key to our escape!",
+                robotY - (height * .3),
+                "Our spaceship is down—we need to reach a mine to collect resources for repairs!\n\nTo avoid breaking the main project, we create a new branch using 'git branch <name>'.\n\nWe use 'git checkout <name>' to switch into that branch and start working.\n\nTry it now to explore the mine without affecting main progress.",
                 {
-                    fontFamily: "Courier, monospace",
-                    fontSize: "10px",
+                    fontFamily: "OCR A Std, Courier, monospace", // A more 'robotic' typeface
+                    fontSize: "12px",
                     fill: "#00ffcc",
-                    align: "center",
-                    backgroundColor: "#000000cc", // semi-transparent
+                    stroke: "#003344",
+                    strokeThickness: 2,
+                    align: "left",
+                    backgroundColor: "#111111cc", // Dark, metallic background
                     padding: { x: 12, y: 8 },
                     wordWrap: { width: 250, useAdvancedWrap: true },
                     shadow: {
-                        offsetX: 2,
-                        offsetY: 2,
-                        color: "#000",
+                        offsetX: 3,
+                        offsetY: 3,
+                        color: "#001122",
                         blur: 2,
                         stroke: false,
                         fill: true,
                     },
+                    lineSpacing: 4,
                 }
             )
             .setOrigin(0.5);
 
         // Spawn the robot sprite
-        this.robot = this.physics.add.sprite(100, 100, "robot").setScale(1.5);
+        this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
         this.robot.anims.play("robot-idle");
         this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
         this.robot.setCollideWorldBounds(true); // Prevent the robot from leaving the game bounds (optional)
@@ -130,7 +133,7 @@ export default class Level2 extends Phaser.Scene {
             const wallLayer = map.createLayer("Walls", tiles);
         });
 
-        this.setFeedback(`Hint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
+        this.setFeedback(`Move: WASD\nTerminal: T\nHint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
     }
 
     // --- *** ADD THIS METHOD *** ---
@@ -159,6 +162,16 @@ export default class Level2 extends Phaser.Scene {
     update(time, delta) {
         if (!this.input.keyboard.enabled) return;
         this.playerController.update();
+    
+        // Check distance between the player and the robot
+        if (this.robot && this.robotInstruction) {
+            const distance = Phaser.Math.Distance.Between(
+                this.player.x, this.player.y,
+                this.robot.x, this.robot.y
+            );
+            const threshold = 50; // Adjust this value as needed
+            this.robotInstruction.setVisible(distance < threshold);
+        }
     }
 
     collectItem(playerSprite, item) {
