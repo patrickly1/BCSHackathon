@@ -14,56 +14,83 @@ export default class Level1 extends Phaser.Scene {
   }
 
   create() {
-    const { width, height } = this.scale;
-    this.cameras.main.setBackgroundColor('#1a1a1a'); // Dark background
-    this.add.image(width/2, height/2,'level1_bg');
-    GameManager.getPlayer().setLocation('Level1');
-    // sets the location of the player to level1
+      const { width, height } = this.scale;
+      this.cameras.main.setBackgroundColor("#1a1a1a"); // Dark background
+      this.add.image(width / 2, height / 2, "level1_bg");
+      GameManager.getPlayer().setLocation("Level1");
+      // sets the location of the player to level1
 
-    // Initial state: Shadowy void with a torch
-    // this.torch = this.add.image(100, 100, 'torch').setScale(0.5); // Example position/asset
+      // Initial state: Shadowy void with a torch
+      // this.torch = this.add.image(100, 100, 'torch').setScale(0.5); // Example position/asset
 
-    this.add
-        .text(240, 32, "Area 1: Space", {
-            fontSize: "16px",
-            fontFamily: "Minecraft",
-            fill: "#fff",
-        })
-        .setOrigin(0.5);
-    this.feedbackText = this.add
-        .text(
-            240,
-            140,
-            "Press T to open terminal.\n\nPres ESC to close terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
-            { fontSize: "16px", fontFamily: "Minecraft", fill: "#aaa" }
-        )
-        .setOrigin(0.5);
+      this.add
+          .text(240, 32, "Branch 1: Space", {
+              fontSize: "16px",
+              fontFamily: "Minecraft",
+              fill: "#fff",
+          })
+          .setOrigin(0.5);
 
-    // Listen for commands from the React Terminal via the global event emitter
-    this.game.events.on('commandInput', this.handleCommand, this);
 
-    // --- Player ---
-    this.player = this.physics.add.sprite(width / 2, 320, "player").setScale(2.5);
-    this.player.setCollideWorldBounds(true);
+      // Listen for commands from the React Terminal via the global event emitter
+      this.game.events.on("commandInput", this.handleCommand, this);
 
-    // --- Input ---
-            // Still add keys so they are ready when input is enabled
-            this.keys = this.input.keyboard.addKeys("W,A,S,D");
-    
-            this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
-    // Add collision
-    // Create a static group to hold collision zones
+      // --- Player ---
+      this.player = this.physics.add.sprite(width / 2, 320, "player").setScale(2.5);
+      this.player.setCollideWorldBounds(true);
 
-    // Red Rectangle for debugging
-    // const zone1 = this.add.rectangle(80, 285, 300, 65, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
-    // const zone2 = this.add.rectangle(160, 350, 150, 40, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
-    // this.physics.add.existing(zone1, true); // true = static body
-    // this.physics.add.existing(zone2, true); // true = static body
+      // --- Input ---
+      // Still add keys so they are ready when input is enabled
+      this.keys = this.input.keyboard.addKeys("W,A,S,D");
 
-    // Cleanup listener when scene is destroyed
-    this.events.on('shutdown', () => {
-      this.game.events.off('commandInput', this.handleCommand, this);
-    });
+      this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
+      const robotX = width * 0.73;
+      const robotY = width * 0.65;
+
+      this.robotInstruction = this.add
+          .text(
+              robotX,
+              robotY - height * 0.3,
+              "Press T to open terminal.\n\nPres ESC to close terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
+              {
+                  fontSize: "10px",
+                  fill: "#00ffcc",
+                  stroke: "#003344",
+                  strokeThickness: 0,
+                  align: "left",
+                  backgroundColor: "#11111188", // Dark, metallic background
+                  padding: { x: 12, y: 8 },
+                  wordWrap: { width: 250, useAdvancedWrap: true },
+                  shadow: {
+                      offsetX: 3,
+                      offsetY: 3,
+                      color: "#001122",
+                      blur: 2,
+                      stroke: false,
+                      fill: true,
+                  },
+                  lineSpacing: 4,
+              }
+          )
+          .setOrigin(0.5);
+
+      // Spawn the robot sprite
+      this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
+      this.robot.anims.play("robot-idle");
+      this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
+      // Add collision
+      // Create a static group to hold collision zones
+
+      // Red Rectangle for debugging
+      // const zone1 = this.add.rectangle(80, 285, 300, 65, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+      // const zone2 = this.add.rectangle(160, 350, 150, 40, 0xff0000, .2).setOrigin(0); // x, y, width, height, color, alpha
+      // this.physics.add.existing(zone1, true); // true = static body
+      // this.physics.add.existing(zone2, true); // true = static body
+
+      // Cleanup listener when scene is destroyed
+      this.events.on("shutdown", () => {
+          this.game.events.off("commandInput", this.handleCommand, this);
+      });
   }
 
   handleCommand(command) {
@@ -89,9 +116,16 @@ export default class Level1 extends Phaser.Scene {
 
 
   update() {
-    if (!this.input.keyboard.enabled) return;
-        this.playerController.update();
-        this.player.x = Phaser.Math.Clamp(this.player.x, 140, 340);
-        this.player.y = Phaser.Math.Clamp(this.player.y, 280, 350);
+      if (!this.input.keyboard.enabled) return;
+      this.playerController.update();
+      this.player.x = Phaser.Math.Clamp(this.player.x, 140, 340);
+      this.player.y = Phaser.Math.Clamp(this.player.y, 280, 350);
+
+      // Check distance between the player and the robot
+      if (this.robot && this.robotInstruction) {
+          const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
+          const threshold = 50; // Adjust this value as needed
+          this.robotInstruction.setVisible(distance < threshold);
+      }
   }
 }

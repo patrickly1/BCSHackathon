@@ -65,7 +65,7 @@ export default class Level3 extends Phaser.Scene {
     const obstacleLayer = map.createLayer("Obstacles", decorativeTiles);
 
     // --- Setup UI Text ---
-    this.add.text(250, 30, 'Level 3: The Resource Mine', { fontSize: '14px', fill: '#fff' }).setOrigin(0.5);
+    this.add.text(250, 30, 'Branch 3: The Mine', { fontSize: '16px', fontFamily: "Minecraft:", fill: '#fff' }).setOrigin(0.5);
     this.feedbackText = this.add.text(
       250,
       100,
