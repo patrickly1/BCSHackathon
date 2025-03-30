@@ -366,6 +366,19 @@ function App() {
     };
   }, []);
 
+//   function getOrCreateUserId() {
+//     const stored = localStorage.getItem('userId');
+//     if (stored) return stored;
+  
+//     const newId = crypto.randomUUID();
+//     localStorage.setItem('userId', newId);
+//     return newId;
+//   }
+
+//   const [userId] = useState(getOrCreateUserId());
+
+
+
   // Handle 'T' key press to toggle terminal
   useEffect(() => {
     const handleKeyDown = (event) => {
