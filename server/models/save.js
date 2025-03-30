@@ -8,4 +8,4 @@ const SaveSchema = new mongoose.Schema({
   inventory: { type: Object, default: {} },
 });
 
-module.exports = mongoose.model('Save', SaveSchema);
+module.exports = mongoose.model('save', SaveSchema);
