@@ -296,7 +296,7 @@ export default class Level4 extends Phaser.Scene {
                 this.portal.destroy(true);
                 this.add.image(width * 0.5, height * 0.2, "spaceship");
             });
-            this.setFeedback("Reset successful! Now move near the spaceship to board. Then type: git push");
+            this.setFeedback("Reset successful! Now move near the spaceship to board. \nThen type: git push");
             this.instructionText.setText("Move near the spaceship to board");
             } else {
             this.setFeedback("You've already resolved the merge conflict. Now push your changes.");
