@@ -545,7 +545,7 @@ function App() {
       {/* Main container: flex layout for game and terminal */}
       <div className="App">
         <div ref={phaserContainerRef} id="phaser-container"></div>
-        {isTerminalOpen && <Terminal onSubmit={handleCommandSubmit} />}
+        {isTerminalOpen && <Terminal onSubmit={handleCommandSubmit} onClick={() => setIsTerminalOpen(false)}/>}
       </div>
     </div>
   );

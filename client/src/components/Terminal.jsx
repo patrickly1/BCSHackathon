@@ -60,6 +60,15 @@ function Terminal({ onSubmit }) {
   }, []);
 
   const handleKeyDown = (e) => {
+    // Prevent key events from propagating to the game
+    e.stopPropagation();
+
+    // If Escape is pressed, close the terminal
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose(); // This calls the onClose callback passed from App.jsx
+      return;
+    }
     if (e.key === 'Enter') {
       e.preventDefault();
       if (command.trim()) {
