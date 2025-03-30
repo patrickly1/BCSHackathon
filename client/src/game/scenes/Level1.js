@@ -78,7 +78,7 @@ export default class Level1 extends Phaser.Scene {
     if (command.toLowerCase() === expectedCommand) {
       if (!this.isCloned) {
         this.isCloned = true;
-        this.scene.start("Level4")
+        this.scene.start("Level2")
       } else {
         this.feedbackText.setText('Incorrect command. Try "git clone gitopia".');
       }
