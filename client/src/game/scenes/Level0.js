@@ -9,7 +9,9 @@ export default class Level0 extends Phaser.Scene {
   preload() {
     // Preload assets if needed.
     // For example, if you have a play button image, uncomment the following:
-    this.load.image('level0_bg', 'assets/level/level0/level0_bg.png');
+    // this.load.image('level0_bg', 'assets/level/level0/level0_bg.png');
+    this.load.image('level0_bg', 'assets/level/level0/space-background.png');
+
   }
 
   create() {
