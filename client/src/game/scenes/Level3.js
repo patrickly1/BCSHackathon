@@ -1,5 +1,7 @@
 // client/src/game/scenes/Level3.js
 import Phaser from 'phaser';
+import GameManager from "../GameManager";
+
 
 const PLAYER_SPEED = 200;
 // Now, the required items are "copper" and "iron"
@@ -38,6 +40,16 @@ export default class Level3 extends Phaser.Scene {
   }
 
   create() {
+
+    const player = GameManager.getPlayer();
+        if (player.getLocation() !== 'Level3') {
+            player.setLocation('Level3');
+            }
+
+        // Update the location in the App (React side)
+        if (this.game.reactSetCurrentLocation) {
+            this.game.reactSetCurrentLocation('Level3');
+        }
     const { width, height } = this.scale;
     this.cameras.main.setBackgroundColor('#3d3d3d'); // Dungeon floor color
 
