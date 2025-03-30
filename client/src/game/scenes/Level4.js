@@ -481,9 +481,9 @@ export default class Level4 extends Phaser.Scene {
 
     // Setup collision layers
     wallLayer.setCollisionByProperty({ collides: true });
-    decorationLayer.setCollisionByProperty({ collides: true });
+    // decorationLayer.setCollisionByProperty({ collides: true });
     this.physics.add.collider(this.player, wallLayer);
-    this.physics.add.collider(this.player, decorationLayer);
+    // this.physics.add.collider(this.player, decorationLayer);
 
     // Setup WASD input for movement
     this.keys = this.input.keyboard.addKeys("W,A,S,D");
