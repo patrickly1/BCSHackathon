@@ -34,6 +34,7 @@ function Terminal({ onSubmit }) {
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.stopPropagation()} // Prevent Phaser from also handling these keys
           className="terminal-input"
           spellCheck="false"
           autoComplete="off"

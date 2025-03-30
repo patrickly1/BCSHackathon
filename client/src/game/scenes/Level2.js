@@ -1,36 +1,101 @@
-// client/src/game/scenes/Level2.js
+// client/src/game/scenes/Level2.js (or Level3.js, Level4.js, etc.)
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
 
-const PLAYER_SPEED = 200; // Pixels per second
-const REQUIRED_ITEMS = ['blade', 'hilt', 'gem'];
+const PLAYER_SPEED = 160;
+const REQUIRED_BRANCH_NAME = 'secret-tunnel';
 
-export default class Level2 extends Phaser.Scene {
+export default class Level2 extends Phaser.Scene { // Adjust class name per level
     constructor() {
-        super('Level2');
+        super('Level2'); // Adjust scene key per level
 
-        // Scene state
         this.player = null;
-        this.keys = null; // To store keyboard keys
-        this.itemsToCollect = null; // Group for collectable items
-        this.anvil = null;
+        this.keys = null;
         this.feedbackText = null;
-
+        this.mapImage = null;
+        this.branchCreated = false;
+        this.checkedOut = false;
         // Game logic state
         // this.inventory = new Set(); // Items the player has picked up
 
         this.stagedItems = new Set(); // Items successfully 'git add'-ed
     }
 
+    // ... preload() ...
     preload() {
-        // Assets should already be loaded by Preloader.js
-        // If you need scene-specific assets, load them here.
+        this.load.image('robot', 'assets/EnemyRobot_Idle.png');
     }
 
     create() {
         const { width, height } = this.scale;
-      
-              GameManager.getPlayer().setLocation('Level2');
+        const centerX = width / 2;
+
+        const robotX = width * 0.5;
+        const robotY = width * 0.7;
+
+        this.robotInstruction = this.add.text(
+            robotX, 
+            robotY - 50, 
+            "Welcome, Commander, to our Hackathon Adventure!\nWASD to navigate, T to open the terminal\nWe’ve crash-landed on an uncharted planet...\nWe need to gather critical resources to survive\nLet’s checkout that mysterious tunnel ahead—it might hold the key to our escape!", 
+            {
+                fontFamily: 'Courier, monospace',
+                fontSize: '10px',
+                fill: '#00ffcc',
+                align: 'center',
+                backgroundColor: '#000000cc', // semi-transparent
+                padding: { x: 12, y: 8 },
+                wordWrap: { width: 250, useAdvancedWrap: true },
+                shadow: {
+                  offsetX: 2,
+                  offsetY: 2,
+                  color: '#000',
+                  blur: 2,
+                  stroke: false,
+                  fill: true
+                }
+            }
+          ).setOrigin(0.5);
+
+        // Spawn the robot sprite
+        this.robot = this.physics.add.sprite(robotX, robotY, 'robot');
+        this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
+        this.robot.setCollideWorldBounds(true); // Prevent the robot from leaving the game bounds (optional)
+        // ... other setup ...
+        this.cameras.main.setBackgroundColor('#2c3e50');
+
+        // --- *** CHANGE HERE: Listen for toggle and handle enable/disable *** ---
+        this.game.events.on("terminalToggled", this.handleTerminalToggle, this);
+        // Ensure keyboard input is ENABLED initially
+        this.input.keyboard.enabled = true;
+        // --- *** END CHANGE *** ---
+
+
+        // --- UI Text ---
+        this.add.text(centerX, 30, 'Level 2: The Mystic Map', { fontSize: '18px', fill: '#fff' }).setOrigin(0.5); // Adjust title
+        this.feedbackText = this.add.text(centerX, height - 30, 'Explore... (Press T)', { fontSize: '12px', fill: '#aaa' }).setOrigin(0.5);
+
+        // --- Player ---
+        this.player = this.physics.add.sprite(centerX, height - 80, 'player');
+        this.player.setCollideWorldBounds(true);
+
+        // --- Input ---
+        // Still add keys so they are ready when input is enabled
+        this.keys = this.input.keyboard.addKeys('W,A,S,D');
+
+        // Command listener
+        this.game.events.on('commandInput', this.handleCommand, this);
+
+        // Shutdown cleanup
+        this.events.on('shutdown', () => {
+            console.log('Level 2 shutdown, removing listeners.');
+            this.game.events.off('commandInput', this.handleCommand, this);
+            // --- *** CHANGE HERE: Remove the terminal toggle listener *** ---
+            this.game.events.off("terminalToggled", this.handleTerminalToggle, this);
+            // --- *** END CHANGE *** ---
+            this.branchCreated = false;
+            this.checkedOut = false;
+          
+             GameManager.getPlayer().setLocation('Level2');
         // sets location of player to level2
 
         if (this.game.reactSetCurrentLocation) {
@@ -44,66 +109,39 @@ export default class Level2 extends Phaser.Scene {
         const tiles = map.addTilesetImage("tiles", "tiles2");
         const groundLayer = map.createLayer("Ground", tiles);
         const wallLayer = map.createLayer("Walls", tiles);
-
-        // --- Setup UI Text ---
-        this.add.text(250, 30, "Level 2: The Blacksmith’s Anvil", { fontSize: "14px", fill: "#fff" }).setOrigin(0.5);
-        this.feedbackText = this.add
-            .text(250, 100, "Collect the sword parts (WASD to move). Press T for terminal.", {
-                fontSize: "16px",
-                fill: "#aaa",
-            })
-            .setOrigin(0.5);
-        this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
-        this.stagedText = this.add.text(10, 30, "Staged: ", { fontSize: "8px", fill: "#fff" });
-
-        // --- Setup Anvil ---
-        this.anvil = this.add.image(width * 0.5, height * 0.5, "anvil").setScale(1.5); // Position the anvil centrally
-
-        // --- Setup Player ---
-        this.player = this.physics.add.sprite(240, 240, "player").setScale(2.5);
-        this.player.play("idle", true);
-        this.player.setCollideWorldBounds(true); // Keep player within game bounds
-        // Optional: Set player size if sprite needs adjusting
-        // this.player.setSize(20, 32).setOffset(6, 16);
-
-        // --- Setup Items ---
-
-        this.itemsToCollect = this.physics.add.group();
-
-        // Create and position items - use setData to store item type
-        const blade = this.itemsToCollect.create(width * 0.8, height * 0.2, "sword_blade").setData("itemName", "blade");
-        const hilt = this.itemsToCollect.create(width * 0.3, height * 0.6, "sword_hilt").setData("itemName", "hilt");
-        const gem = this.itemsToCollect.create(width * 0.2, height * 0.4, "gem").setData("itemName", "gem");
-
-        // --- Setup Physics ---
-        // Add overlap detection between player and items
-        this.physics.add.overlap(this.player, this.itemsToCollect, this.collectItem, null, this);
-
-        // --- Setup Input ---
-        // Basic WASD controls
-        this.keys = this.input.keyboard.addKeys("W,A,S,D");
-
-        // Listen for commands from the React Terminal
-        this.game.events.on("commandInput", this.handleCommand, this);
-
-        // Cleanup listener when scene is destroyed
-        this.events.on("shutdown", () => {
-            console.log("Level 2 shutdown, removing listener.");
-            this.game.events.off("commandInput", this.handleCommand, this);
-            // Reset state for potential restarts if needed (or handle in init/create)
-            this.stagedItems.clear();
         });
 
-        // Initial state update
-        this.updateStatusText();
+        this.setFeedback(`Hint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
     }
 
+    // --- *** ADD THIS METHOD *** ---
+    handleTerminalToggle(isOpen) {
+        console.log(`Phaser Scene: Setting keyboard input = ${!isOpen}`);
+    
+        if (isOpen) {
+            // Terminal is OPEN, disable all keyboard input in Phaser
+            this.input.keyboard.enabled = false;
+            this.input.keyboard.removeAllListeners(); // 🚨 Stop listening to all key events
+        } else {
+            // Terminal is CLOSED, re-enable keyboard input
+            this.input.keyboard.enabled = true;
+    
+            // Re-add keys manually after clearing listeners
+            this.keys = this.input.keyboard.addKeys('W,A,S,D');
+        }
+    
+        // Ensure player stops moving immediately when terminal opens
+        if (isOpen && this.player) {
+            this.player.setVelocity(0);
+        }
+    }
+    // --- *** END ADDED METHOD *** ---
+
     update(time, delta) {
-        if (!this.player || !this.keys) return; // Guard clause
-
+        if (!this.player || !this.keys || !this.input.keyboard.enabled) return; // 🚨 Prevent movement if keyboard is disabled
+    
         this.player.setVelocity(0);
-
-        // Horizontal movement
+    
         if (this.keys.A.isDown) {
             this.player.setVelocityX(-PLAYER_SPEED);
             this.player.setFlipX(true); // Mirror horizontally
@@ -121,11 +159,9 @@ export default class Level2 extends Phaser.Scene {
         } else {
             this.player.play("idle", true);
         }
-
-        // Normalize speed for diagonal movement
+    
         this.player.body.velocity.normalize().scale(PLAYER_SPEED);
-
-        // --- Add simple player direction facing (optional) ---
+      // --- Add simple player direction facing (optional) ---
         // if (this.keys.A.isDown) this.player.flipX = true;
         // if (this.keys.D.isDown) this.player.flipX = false;
     }
@@ -145,81 +181,64 @@ export default class Level2 extends Phaser.Scene {
     }
 }
 
+    // ... handleCommand() ... (Keep existing, ensure scene transition is correct)
     handleCommand(command) {
-        if (!this.scene.isActive()) {
-            return; // Don't process if scene is not active
-        }
+        if (!this.scene.isActive() || this.checkedOut) { /* ... */ return; }
         console.log(`Level 2 received command: ${command}`);
+        const parts = command.trim().toLowerCase().split(' ');
+        const action = parts[0]; const verb = parts[1]; const arg = parts[2];
 
-        const parts = command.trim().toLowerCase().split(' '); // Split command into parts
-        const action = parts[0];
-        const verb = parts[1];
-        const target = parts[2]; // The item name
-
-        if (action !== 'git' || verb !== 'add' || !target) {
-            this.setFeedback(`Invalid command format. Use: git add <item_name>`);
+        if (action === 'git' && verb === 'branch' && arg) {
+            if (arg === REQUIRED_BRANCH_NAME) {
+                if (!this.branchCreated) {
+                    this.branchCreated = true;
+                    this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' created! Now switch to it.`);
+                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' already exists.`); }
+            } else { this.setFeedback(`Incorrect branch name. Use: '${REQUIRED_BRANCH_NAME}'`); }
             return;
         }
-
-        // Check if the target item is one of the required ones
-        if (!REQUIRED_ITEMS.includes(target)) {
-            this.setFeedback(`Cannot add '${target}'. It's not part of the sword.`);
-            return;
-        }
-
-        const player = GameManager.getPlayer();
+      
+       if (action === 'git' && verb === 'checkout' && arg) {
+             if (arg === REQUIRED_BRANCH_NAME) {
+                if (this.branchCreated) {
+                    if (!this.checkedOut) {
+                        this.checkedOut = true;
+                        this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
+                        this.revealPassage();
+                        this.time.delayedCall(2500, () => {
+                            // --- MAKE SURE this transitions to the correct NEXT level ---
+                            this.scene.start('Level3'); // Or Level4, Level5 etc.
+                            // --- END ---
+                        });
+                    } else { this.setFeedback(`Already on branch '${REQUIRED_BRANCH_NAME}'.`); }
+                } else { this.setFeedback(`Branch '${REQUIRED_BRANCH_NAME}' doesn't exist yet. Use 'git branch' first.`); }
+            } else { this.setFeedback(`Cannot checkout that branch. Use: '${REQUIRED_BRANCH_NAME}'`); }
+         const player = GameManager.getPlayer();
         if (!player.getInventory().includes(target)) {
             this.setFeedback(`You haven't collected the ${target} yet!`);
             return;
         }
-
-        // Check if the item has already been staged
-        if (this.stagedItems.has(target)) {
-            this.setFeedback(`The ${target} is already on the anvil (staged).`);
-            return;
-        }
-
-        // --- Success: Stage the item ---
-        this.stagedItems.add(target);
-        this.setFeedback(`Success! Added ${target} to the anvil.`);
-        console.log(`Staged: ${target}`);
-        this.updateStatusText();
-
-        // --- Check for Win Condition ---
-        if (this.checkWinCondition()) {
-            this.setFeedback('All parts staged! Ready to forge. Proceeding...');
-            this.time.delayedCall(2500, () => {
-                this.scene.start('Level3'); // Move to the next level
-            });
-        }
+        this.setFeedback(`Unknown command. Try 'git branch ...' or 'git checkout ...'`);
     }
 
-    checkWinCondition() {
-        // Check if the number of staged items matches the required number
-        if (this.stagedItems.size !== REQUIRED_ITEMS.length) {
-            return false;
-        }
-        // Optionally, double-check if *all* required items are present
-        return REQUIRED_ITEMS.every(item => this.stagedItems.has(item));
-    }
 
+    // ... revealPassage() ... (Keep existing)
+     revealPassage() {
+        this.cameras.main.setBackgroundColor('#34495e');
+        this.add.text(this.scale.width / 2, this.scale.height / 2, 'Passage Opened!', { fontSize: '20px', fill: '#0f0' }).setOrigin(0.5);
+    }
+      
+    // ... setFeedback() ... (Keep existing)
     setFeedback(message) {
-        this.feedbackText.setText(message);
-        // Optional: Clear feedback after a delay
-        // if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-        // this.feedbackTimeout = setTimeout(() => {
-        //     if (this.feedbackText.active) { // Check if text object still exists
-        //       this.feedbackText.setText('Use terminal (T) to "git add <item_name>"');
-        //     }
-        // }, 4000);
-    }
-
+         if (this.feedbackText && this.feedbackText.active) {
+             this.feedbackText.setText(message);
+         }
     updateStatusText() {
-         // Use Array.from() to convert Set to Array for joining
-         const player = GameManager.getPlayer();
-         const collectedList = player.getInventory().join(', ') || 'None';
-         const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-         this.collectedText.setText(`Collected: ${collectedList}`);
-         this.stagedText.setText(`Staged: ${stagedList}`);
+       // Use Array.from() to convert Set to Array for joining
+       const player = GameManager.getPlayer();
+       const collectedList = player.getInventory().join(', ') || 'None';
+       const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
+       this.collectedText.setText(`Collected: ${collectedList}`);
+       this.stagedText.setText(`Staged: ${stagedList}`);
     }
 }

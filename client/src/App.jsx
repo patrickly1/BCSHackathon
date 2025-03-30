@@ -217,6 +217,7 @@ function App() {
       const isInputFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
 
       if (event.key.toUpperCase() === 'T' && !event.repeat && !isInputFocused) {
+        event.preventDefault();
         setIsTerminalOpen(prev => !prev);
       }
     };
@@ -239,7 +240,14 @@ function App() {
     // Optionally, close terminal after command, or keep it open
     // setIsTerminalOpen(false);
   };
-
+  
+  // Inside App.jsx
+  useEffect(() => {
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.events.emit("terminalToggled", isTerminalOpen);
+    }
+  }, [isTerminalOpen]); // Re-run when terminal state changes
+  
   const handleSave = async () => {
     let saveName = username;
     // this is blan by default - check top of the page
