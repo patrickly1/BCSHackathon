@@ -8,16 +8,19 @@ const REQUIRED_BRANCH_NAME = 'mine';
 
 export default class Level4 extends Phaser.Scene {
   constructor() {
-    super('Level4');
-    this.player = null;
-    this.keys = null;
-    this.feedbackText = null;
-    this.instructionText = null; // Always-visible instruction text
+      super("Level4");
+      this.player = null;
+      this.keys = null;
+      this.feedbackText = null;
+      this.instructionText = null; // Always-visible instruction text
 
-    // Level state flags for our command sequence:
-    this.stashDone = false;      // Items from the mine have been stashed
-    this.mergeAttempted = false; // Merge was attempted (and produced an error)
-    this.resetDone = false;      // Merge conflict was resolved via reset
+      // Level state flags for our command sequence:
+      this.stashDone = false; // Items from the mine have been stashed
+      this.mergeAttempted = false; // Merge was attempted (and produced an error)
+      this.resetDone = false; // Merge conflict was resolved via reset
+
+      // Flag for robot interaction
+      this.robotInteracted = false;
   }
 
   preload() {
@@ -100,7 +103,7 @@ export default class Level4 extends Phaser.Scene {
 
     this.robotInstruction = this.add.text(
       robotX,
-      robotY - height * 0.3,
+      robotY - height * 0.27,
       "You’re back at base with everything you collected from the mine.\n\nBefore merging, stash any rare items using 'git stash' to keep them safe.\n\nNow run 'git merge mine' to bring your work into the project.\n\nThen walk over to the spaceship—it’s ready for repairs.\n\nPush your updates to mission control using 'git push', and prepare for launch.",
       {
         fontSize: "10px",
@@ -128,6 +131,16 @@ export default class Level4 extends Phaser.Scene {
     this.robot.setFlipX(true);
     this.robot.anims.play("robot-idle");
     this.robot.setOrigin(0.5);
+
+    this.robotAlert = this.add
+        .text(robotX, robotY - 25, "!", {
+            fontSize: "20px",
+            fontFamily: "Minecraft",
+            color: "#ff0000",
+            stroke: "#000000",
+            strokeThickness: 3,
+        })
+        .setOrigin(0.5);
   }
 
   handleTerminalToggle(isOpen) {
@@ -146,15 +159,23 @@ export default class Level4 extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (!this.input.keyboard.enabled) return;
-    this.playerController.update();
+      if (!this.input.keyboard.enabled) return;
+      this.playerController.update();
 
-    // Check distance between the player and the robot
-    if (this.robot && this.robotInstruction) {
-      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
-      const threshold = 50; // Adjust as needed
-      this.robotInstruction.setVisible(distance < threshold);
-    }
+      // Check distance between the player and the robot
+      if (this.robot && this.robotInstruction) {
+          const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
+          const threshold = 50; // Adjust as needed
+          this.robotInstruction.setVisible(distance < threshold);
+
+          if (this.robotAlert && !this.robotInteracted) {
+              this.robotAlert.setVisible(distance >= threshold);
+          }
+
+          if (distance < threshold && !this.robotInteracted) {
+              this.robotInteracted = true;
+          }
+      }
   }
 
   handleCommand(command) {
