@@ -27,11 +27,12 @@ export default class Level2 extends Phaser.Scene {
         this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
         this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
         this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
-        
+        this.load.image('level2_bg',"assets/level/crashsite/level2_bg.png");
     }
 
     create() {
-
+        const { width, height } = this.scale;
+        this.add.image(width/2, height/2,'level2_bg');
         const player = GameManager.getPlayer();
         if (player.getLocation() !== 'Level2') {
             player.setLocation('Level2');
@@ -42,11 +43,10 @@ export default class Level2 extends Phaser.Scene {
             this.game.reactSetCurrentLocation('Level2');
         }
 
-        const { width, height } = this.scale;
         const centerX = width / 2;
 
-        const robotX = width * 0.5;
-        const robotY = width * 0.7;
+        const robotX = centerX;
+        const robotY = height - 80;
     
 
         this.robotInstruction = this.add
@@ -96,8 +96,32 @@ export default class Level2 extends Phaser.Scene {
             .setOrigin(0.5);
 
         // --- Player ---
-        this.player = this.physics.add.sprite(centerX, height - 80, "player").setScale(2.5);
+        this.player = this.physics.add.sprite(width * 0.5, height * 0.5, "player").setScale(2.5);
         this.player.setCollideWorldBounds(true);
+
+        // Add Ship Collision
+        const squareOne = this.add.rectangle(240, 320, 100, 100, 0xff0000, 0);
+        const squareTwo = this.add.rectangle(200, 320, 50, 50, 0xff0000, 0);
+        const squareThree = this.add.rectangle(190, 330, 50, 50, 0xff0000, 0);
+        const squareFour = this.add.rectangle(180, 340, 50, 50, 0xff0000, 0);
+        const squareFive = this.add.rectangle(170, 350, 50, 50, 0xff0000, 0);
+        const squareSix = this.add.rectangle(300, 250, 50, 50, 0xff0000, 0);
+
+
+
+        this.physics.add.existing(squareOne, true); 
+        this.physics.add.collider(this.player, squareOne);
+        this.physics.add.existing(squareTwo, true);
+        this.physics.add.collider(this.player, squareTwo);
+        this.physics.add.existing(squareThree, true);
+        this.physics.add.collider(this.player, squareThree);
+        this.physics.add.existing(squareFour, true);
+        this.physics.add.collider(this.player, squareFour);
+        this.physics.add.existing(squareFive, true);
+        this.physics.add.collider(this.player, squareFive);
+        this.physics.add.existing(squareSix, true);
+        this.physics.add.collider(this.player, squareSix);
+
 
         // --- Input ---
         // Still add keys so they are ready when input is enabled
@@ -173,6 +197,11 @@ export default class Level2 extends Phaser.Scene {
             const threshold = 50; // Adjust this value as needed
             this.robotInstruction.setVisible(distance < threshold);
         }
+
+        if (!this.input.keyboard.enabled) return;
+            this.playerController.update();
+            this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
+            this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
     }
 
     collectItem(playerSprite, item) {
