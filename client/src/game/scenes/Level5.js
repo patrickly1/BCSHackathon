@@ -15,7 +15,7 @@ export default class Level5 extends Phaser.Scene {
   }
 
   create() {
-    this.warpSound.play();
+    // this.warpSound.play();
     const { width, height } = this.scale;
 
     const centerX = width / 2;
