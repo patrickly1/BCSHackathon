@@ -20,6 +20,9 @@ export default class Level2 extends Phaser.Scene {
         // Game logic state
         // this.inventory = new Set(); // Items the player has picked up
 
+        // Flag for robot interaction
+        this.robotInteracted = false;
+
         this.stagedItems = new Set(); // Items successfully 'git add'-ed
     }
 
@@ -33,27 +36,26 @@ export default class Level2 extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        this.add.image(width/2, height/2,'level2_bg');
+        this.add.image(width / 2, height / 2, "level2_bg");
         const player = GameManager.getPlayer();
-        if (player.getLocation() !== 'Level2') {
-            player.setLocation('Level2');
-            }
+        if (player.getLocation() !== "Level2") {
+            player.setLocation("Level2");
+        }
 
         // Update the location in the App (React side)
         if (this.game.reactSetCurrentLocation) {
-            this.game.reactSetCurrentLocation('Level2');
+            this.game.reactSetCurrentLocation("Level2");
         }
 
         const centerX = width / 2;
 
         const robotX = centerX;
         const robotY = height - 80;
-    
 
         this.robotInstruction = this.add
             .text(
                 robotX,
-                robotY - height * 0.3,
+                robotY - height * 0.25,
                 "Our spaceship is down—we need to reach a mine to collect resources for repairs!\n\nTo avoid breaking the main project, we create a new branch using 'git branch <name>'.\n\nWe use 'git checkout <name>' to switch into that branch and start working.\n\nTry it now to explore the mine without affecting main progress.",
                 {
                     fontSize: "10px",
@@ -79,8 +81,20 @@ export default class Level2 extends Phaser.Scene {
 
         // Spawn the robot sprite
         this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
+
         this.robot.anims.play("robot-idle");
         this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
+
+        this.robotAlert = this.add
+            .text(robotX, robotY - 25, "!", {
+                fontSize: "20px",
+                fontFamily: "Minecraft",
+                color: "#ff0000",
+                stroke: "#000000",
+                strokeThickness: 3,
+            })
+            .setOrigin(0.5);
+
         // ... other setup ...
         this.cameras.main.setBackgroundColor("#2c3e50");
 
@@ -91,13 +105,17 @@ export default class Level2 extends Phaser.Scene {
         // --- *** END CHANGE *** ---
 
         // --- UI Text ---
-        this.add.text(centerX, 30, "Branch 2: Gitopia", { fontSize: "16px", fontFamily: "Minecraft", fill: "#fff" }).setOrigin(0.5); // Adjust title
+        this.add
+            .text(centerX, 30, "Branch 2: Gitopia", { fontSize: "16px", fontFamily: "Minecraft", fill: "#fff" })
+            .setOrigin(0.5); // Adjust title
         this.feedbackText = this.add
             .text(centerX, height - 30, "Explore... (Press T)", { fontSize: "12px", fill: "#aaa" })
             .setOrigin(0.5);
 
         // --- Player ---
         this.player = this.physics.add.sprite(width * 0.5, height * 0.5, "player").setScale(2.5);
+        this.player.body.setSize(6, 8); // width, height
+        this.player.body.setOffset(3, 8); // center it if neededw
         this.player.setCollideWorldBounds(true);
 
         // Add Ship Collision
@@ -108,9 +126,7 @@ export default class Level2 extends Phaser.Scene {
         const squareFive = this.add.rectangle(170, 350, 50, 50, 0xff0000, 0);
         const squareSix = this.add.rectangle(300, 250, 50, 50, 0xff0000, 0);
 
-
-
-        this.physics.add.existing(squareOne, true); 
+        this.physics.add.existing(squareOne, true);
         this.physics.add.collider(this.player, squareOne);
         this.physics.add.existing(squareTwo, true);
         this.physics.add.collider(this.player, squareTwo);
@@ -122,7 +138,6 @@ export default class Level2 extends Phaser.Scene {
         this.physics.add.collider(this.player, squareFive);
         this.physics.add.existing(squareSix, true);
         this.physics.add.collider(this.player, squareSix);
-
 
         // --- Input ---
         // Still add keys so they are ready when input is enabled
@@ -188,21 +203,26 @@ export default class Level2 extends Phaser.Scene {
     update(time, delta) {
         if (!this.input.keyboard.enabled) return;
         this.playerController.update();
-    
+
         // Check distance between the player and the robot
         if (this.robot && this.robotInstruction) {
-            const distance = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                this.robot.x, this.robot.y
-            );
-            const threshold = 50; // Adjust this value as needed
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
+            const threshold = 50; // Adjust as needed
             this.robotInstruction.setVisible(distance < threshold);
+
+            if (this.robotAlert && !this.robotInteracted) {
+                this.robotAlert.setVisible(distance >= threshold);
+            }
+
+            if (distance < threshold && !this.robotInteracted) {
+                this.robotInteracted = true;
+            }
         }
 
         if (!this.input.keyboard.enabled) return;
-            this.playerController.update();
-            this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
-            this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
+        this.playerController.update();
+        this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
+        this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
     }
 
     collectItem(playerSprite, item) {
