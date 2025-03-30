@@ -20,7 +20,10 @@ export default class Level4 extends Phaser.Scene {
   }
 
   preload() {
-
+    this.load.image("baseTiles", 'assets/level/base/tiles.png')
+    this.load.image("decorationTiles", 'assets/level/base/TileSet v1.0.png')
+    this.load.image("computerTile", 'assets/level/base/computer_terminal.png')
+    this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
   }
 
   create() {
@@ -69,7 +72,10 @@ export default class Level4 extends Phaser.Scene {
 
     // --- Setup Collision ---
     // Add collisions
+
     wallLayer.setCollisionByProperty({ collides: true });
+
+
     decorationLayer.setCollisionByProperty({ collides: true });
     this.physics.add.collider(this.player, wallLayer);
     this.physics.add.collider(this.player, decorationLayer);

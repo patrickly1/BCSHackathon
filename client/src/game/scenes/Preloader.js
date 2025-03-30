@@ -73,8 +73,6 @@ export default class Preloader extends Phaser.Scene {
 
     // Tilemap (level4)
     this.load.image("baseTiles", 'assets/level/base/tiles.png')
-    this.load.image("decorationTiles", 'assets/level/base/TileSet v1.0.png')
-    this.load.image("computerTile", 'assets/level/base/computer_terminal.png')
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
 
   }

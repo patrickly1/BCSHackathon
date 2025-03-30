@@ -24,6 +24,9 @@ export default class Level2 extends Phaser.Scene {
 
     // ... preload() ...
     preload() {
+        this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
+        this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
+        this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
         
     }
 
