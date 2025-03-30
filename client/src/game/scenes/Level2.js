@@ -220,7 +220,7 @@ export default class Level2 extends Phaser.Scene {
                 if (this.branchCreated) {
                     if (!this.checkedOut) {
                         this.checkedOut = true;
-                        this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Passage revealed!`);
+                        this.setFeedback(`Switched to branch '${REQUIRED_BRANCH_NAME}'. Prepare for landing!`);
                         // this.revealPassage();
                         this.time.delayedCall(2500, () => {
                             this.scene.start("Level3"); // Update as needed
