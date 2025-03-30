@@ -73,6 +73,8 @@ export default class Preloader extends Phaser.Scene {
 
     // Tilemap (level4)
     this.load.image("baseTiles", 'assets/level/base/tiles.png')
+    this.load.image("decorationTiles", 'assets/level/base/TileSet v1.0.png')
+    this.load.image("computerTile", 'assets/level/base/computer_terminal.png')
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
 
   }
@@ -116,6 +118,6 @@ export default class Preloader extends Phaser.Scene {
           frameRate: 4, // 4 frames per second
           repeat: -1, // loop forever
       });
-      this.scene.start("Level1"); //Start first level
+      this.scene.start("Level4"); //Start first level
   }
 }

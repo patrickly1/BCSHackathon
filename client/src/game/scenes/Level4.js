@@ -42,8 +42,14 @@ export default class Level4 extends Phaser.Scene {
     // Setup tilemap
     const map = this.add.tilemap("levelFourMap");
     const mainTiles = map.addTilesetImage("tiles", "baseTiles")
+    const decorationTiles = map.addTilesetImage("TileSet v1.0", "decorationTiles")
+    const computerTile = map.addTilesetImage("computer_terminal", "computerTile")
+
     const floorLayer = map.createLayer("Floor", mainTiles)
     const wallLayer = map.createLayer("Walls", mainTiles)
+    const decorationLayer = map.createLayer("decorations", decorationTiles)
+    const computerLayer = map.createLayer("computer", computerTile)
+
 
     // Title text
     this.add.text(centerX, 30, 'Level 4: The Final Merge', {
@@ -64,7 +70,10 @@ export default class Level4 extends Phaser.Scene {
     // --- Setup Collision ---
     // Add collisions
     wallLayer.setCollisionByProperty({ collides: true });
+    decorationLayer.setCollisionByProperty({ collides: true });
     this.physics.add.collider(this.player, wallLayer);
+    this.physics.add.collider(this.player, decorationLayer);
+
 
     // Setup WASD input for movement
     this.keys = this.input.keyboard.addKeys('W,A,S,D');
