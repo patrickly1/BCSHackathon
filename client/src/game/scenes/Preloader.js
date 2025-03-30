@@ -70,13 +70,16 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
     this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
 
+    // Tilemap (level4)
+    this.load.image("baseTiles", 'assets/level/base/tiles.png')
+    this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
+
   }
   create() {
     const savedLocation = GameManager.getPlayer().getLocation() || 'Level1';
     console.log(`Preloader complete. Starting ${savedLocation}.`);
     this.scene.start(savedLocation);
-    
-    console.log("Preloader complete. Starting Level 1.");
+
 
       //Player animations
       this.anims.create({
