@@ -13,7 +13,7 @@ export const config = {
     width: 480,
     height: 480,
     scale: {
-        zoom: 1.5, // scales the canvas to appear 2x larger (960x960)
+        zoom: 1, // scales the canvas to appear 2x larger (960x960)
     },
     physics: {
         default: "arcade",
