@@ -145,6 +145,7 @@ export default class Preloader extends Phaser.Scene {
         frameRate: 15, // 4 frames per second
         repeat: -1, // loop forever
       });
+      
       this.anims.create({
         key: "ship-engine",
         frames: this.anims.generateFrameNumbers("fire_anim", { start: 0, end: 7 }),
