@@ -1,5 +1,7 @@
 // client/src/game/scenes/Level3.js
 import Phaser from 'phaser';
+import PlayerController from "../PlayerController";
+
 
 const PLAYER_SPEED = 200;
 // Now, the required items are "copper" and "iron"
@@ -62,7 +64,7 @@ export default class Level3 extends Phaser.Scene {
     // --- Remove the anvil (it's no longer needed) ---
 
     // --- Setup Player ---
-    this.player = this.physics.add.sprite(100, 450, 'player');
+    this.player = this.physics.add.sprite(width / 2, height / 2, 'player').setScale(2.5);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10); // Ensure player is drawn above items
 
@@ -81,6 +83,8 @@ export default class Level3 extends Phaser.Scene {
 
     // --- Setup Input ---
     this.keys = this.input.keyboard.addKeys('W,A,S,D');
+    this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
+
 
     // Listen for commands from the React Terminal
     this.game.events.on('commandInput', this.handleCommand, this);
@@ -97,21 +101,8 @@ export default class Level3 extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (!this.player || !this.keys) return;
-
-    this.player.setVelocity(0);
-
-    if (this.keys.A.isDown) {
-      this.player.setVelocityX(-PLAYER_SPEED);
-    } else if (this.keys.D.isDown) {
-      this.player.setVelocityX(PLAYER_SPEED);
-    }
-    if (this.keys.W.isDown) {
-      this.player.setVelocityY(-PLAYER_SPEED);
-    } else if (this.keys.S.isDown) {
-      this.player.setVelocityY(PLAYER_SPEED);
-    }
-    this.player.body.velocity.normalize().scale(PLAYER_SPEED);
+    if (!this.input.keyboard.enabled) return;
+    this.playerController.update();
   }
 
   handleCommand(command) {

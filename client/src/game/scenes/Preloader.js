@@ -86,7 +86,7 @@ export default class Preloader extends Phaser.Scene {
       this.anims.create({
           key: "walk-right",
           frames: this.anims.generateFrameNumbers("player", { frames: [15, 16, 17, 18, 19] }),
-          frameRate: 16,
+          frameRate: 24,
           repeat: -1,
           yoyo: true,
       });

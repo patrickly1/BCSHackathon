@@ -1,7 +1,9 @@
 // client/src/game/scenes/Level4.js
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
+import PlayerController from "../PlayerController";
 
+const PLAYER_SPEED = 160;
 const REQUIRED_BRANCH_NAME = 'secret-tunnel';
 
 export default class Level4 extends Phaser.Scene {
@@ -47,7 +49,7 @@ export default class Level4 extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Create the player sprite (for movement only)
-    this.player = this.physics.add.sprite(centerX, height - 80, 'player');
+    this.player = this.physics.add.sprite(centerX, height - 80, 'player').setScale(2.5);
     this.player.setCollideWorldBounds(true);
 
     // --- Setup Collision ---
@@ -57,6 +59,7 @@ export default class Level4 extends Phaser.Scene {
 
     // Setup WASD input for movement
     this.keys = this.input.keyboard.addKeys('W,A,S,D');
+    this.playerController = new PlayerController(this.player, this.keys, PLAYER_SPEED);
 
     // Listen for command input events
     this.game.events.on('commandInput', this.handleCommand, this);
@@ -82,22 +85,8 @@ export default class Level4 extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // Do nothing if keyboard is disabled or player not defined
-    if (!this.player || !this.keys || !this.input.keyboard.enabled) return;
-
-    this.player.setVelocity(0);
-
-    if (this.keys.A.isDown) {
-      this.player.setVelocityX(-160);
-    } else if (this.keys.D.isDown) {
-      this.player.setVelocityX(160);
-    }
-    if (this.keys.W.isDown) {
-      this.player.setVelocityY(-160);
-    } else if (this.keys.S.isDown) {
-      this.player.setVelocityY(160);
-    }
-    this.player.body.velocity.normalize().scale(160);
+    if (!this.input.keyboard.enabled) return;
+    this.playerController.update();
   }
 
   handleCommand(command) {
