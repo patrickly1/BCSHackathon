@@ -9,10 +9,13 @@ export default class Level5 extends Phaser.Scene {
   preload() {
     // Load your image asset for Level5
     this.load.image('level0_bg', 'assets/level/level5/level0_bg.png');
-
+    this.robotSound = this.sound.add("robot");
+    this.warpSound = this.sound.add("level-delay-sound");
+    this.warpSound = this.sound.add("level-delay-sound");
   }
 
   create() {
+    this.warpSound.play();
     const { width, height } = this.scale;
 
     const centerX = width / 2;
