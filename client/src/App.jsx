@@ -1,3 +1,6 @@
+
+
+
 // // src/App.jsx
 // import React, { useState, useEffect, useRef } from 'react';
 // import Terminal from './components/Terminal'; // Make sure path is correct
@@ -503,22 +506,27 @@ function App() {
       }}>
         <button
           onClick={handleSave}
-          style={{ marginRight: '5px', padding: '2px 4px', fontSize: '10px' }}
+          style={{ marginRight: '5px', padding: '2px 4px', fontSize: '20px' }}
         >
           💾 Save
         </button>
         <button
           onClick={handleLoad}
-          style={{ padding: '2px 4px', fontSize: '10px' }}
+          style={{ padding: '2px 4px', fontSize: '20px' }}
         >
           📂 Load
         </button>
       </div>
-      <div style={{
-        position: 'fixed',
+      <div className="App" style={{ display: 'flex' }}>
+    {/* Left: Game & HUD container */}
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+        <div ref={phaserContainerRef} id="phaser-container" />
+        
+        {/* Inventory HUD inside game frame */}
+        <div style={{
+        position: 'absolute',
         top: 10,
         right: 10,
-        zIndex: 9999,
         fontSize: '10px',
         opacity: 0.9,
         textAlign: 'left',
@@ -527,26 +535,29 @@ function App() {
         borderRadius: '4px',
         width: '120px',
         wordWrap: 'break-word',
-        overflowWrap: 'break-word'
-      }}>
+        overflowWrap: 'break-word',
+        pointerEvents: 'none'
+        }}>
         <div><strong>User:</strong> {username || '—'}</div>
         <div><strong>Time:</strong> {timeElapsed}s</div>
         <div><strong>Location:</strong> {currentLocation || '—'}</div>
         <div><strong>Inventory:</strong></div>
         {Object.entries(GameManager.getPlayer().inventory).map(([location, items]) => (
-          <div key={location}>
+            <div key={location}>
             <strong>{location}:</strong>{' '}
             <span style={{ display: 'inline-block', wordBreak: 'break-word' }}>
-              {items.join(', ') || '—'}
+                {items.join(', ') || '—'}
             </span>
-          </div>
+            </div>
         ))}
-      </div>
-      {/* Main container: flex layout for game and terminal */}
-      <div className="App">
-        <div ref={phaserContainerRef} id="phaser-container"></div>
-        {isTerminalOpen && <Terminal onSubmit={handleCommandSubmit} onClose={() => setIsTerminalOpen(false)} />}
-      </div>
+        </div>
+    </div>
+
+    {/* Right: Terminal floats beside */}
+    {isTerminalOpen && (
+        <Terminal onSubmit={handleCommandSubmit} onClose={() => setIsTerminalOpen(false)} />
+    )}
+    </div>
     </div>
   );
 }

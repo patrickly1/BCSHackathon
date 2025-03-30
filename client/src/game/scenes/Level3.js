@@ -80,7 +80,7 @@ export default class Level3 extends Phaser.Scene {
           })
           .setOrigin(0.5);
 
-      this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
+    //   this.collectedText = this.add.text(10, 10, "Collected: ", { fontSize: "8px", fill: "#fff" });
       this.stagedText = this.add.text(10, 30, "Staged: ", { fontSize: "8px", fill: "#fff" });
 
       // --- Setup Player ---
@@ -279,7 +279,7 @@ export default class Level3 extends Phaser.Scene {
   updateStatusText() {
     const collectedList = Array.from(this.inventory).join(', ') || 'None';
     const stagedList = Array.from(this.stagedItems).join(', ') || 'None';
-    this.collectedText.setText(`Collected: ${collectedList}`);
+    // this.collectedText.setText(`Collected: ${collectedList}`);
     this.stagedText.setText(`Staged: ${stagedList}`);
   }
 
