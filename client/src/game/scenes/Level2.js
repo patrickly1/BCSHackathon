@@ -27,11 +27,12 @@ export default class Level2 extends Phaser.Scene {
         this.load.image("mainTiles", 'assets/level/mine/MainLev2.0.png')
         this.load.image("decorativeTiles", 'assets/level/mine/decorative.png')
         this.load.tilemapTiledJSON("levelThreeMap", 'assets/level/mine/mine.tmj')
-        
+        this.load.image('level2_bg',"assets/level/crashsite/level2_bg.png");
     }
 
     create() {
-
+        const { width, height } = this.scale;
+        this.add.image(width/2, height/2,'level2_bg');
         const player = GameManager.getPlayer();
         if (player.getLocation() !== 'Level2') {
             player.setLocation('Level2');
@@ -42,11 +43,10 @@ export default class Level2 extends Phaser.Scene {
             this.game.reactSetCurrentLocation('Level2');
         }
 
-        const { width, height } = this.scale;
         const centerX = width / 2;
 
-        const robotX = width * 0.5;
-        const robotY = width * 0.7;
+        const robotX = centerX;
+        const robotY = height - 80;
     
 
         this.robotInstruction = this.add
@@ -98,7 +98,7 @@ export default class Level2 extends Phaser.Scene {
             .setOrigin(0.5);
 
         // --- Player ---
-        this.player = this.physics.add.sprite(centerX, height - 80, "player").setScale(2.5);
+        this.player = this.physics.add.sprite(width * 0.5, height * 0.5, "player").setScale(2.5);
         this.player.setCollideWorldBounds(true);
 
         // --- Input ---
