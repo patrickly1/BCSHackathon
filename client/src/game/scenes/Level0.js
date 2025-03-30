@@ -16,7 +16,7 @@ export default class Level0 extends Phaser.Scene {
     const { width, height } = this.scale;
 
     const centerX = width / 2;
-    const centerY = width / 2;
+    const centerY = height / 2;
 
     // Set a dark background for the title screen.
     this.cameras.main.setBackgroundColor('#000000');

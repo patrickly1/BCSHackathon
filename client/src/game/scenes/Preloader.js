@@ -61,6 +61,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet("player", "assets/astro.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("robot", "assets/EnemyRobot_Idle.png", { frameWidth: 32, frameHeight: 32 });
     // ... load all other assets
+
+    // Assets for level0
     this.load.spritesheet("planet", "assets/level/level0/planet.png", { frameWidth: 100, frameHeight: 100 });
 
     // Tilemap (level2)
@@ -75,6 +77,10 @@ export default class Preloader extends Phaser.Scene {
     // Tilemap (level4)
     this.load.image("baseTiles", 'assets/level/base/tiles.png')
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj')
+
+    // Assets for level5
+    this.load.spritesheet("fire_anim", "assets/level/level5/fire_anim.png", { frameWidth: 24, frameHeight: 32 });
+    this.load.image("level5_spaceship", 'assets/level/level5/spaceship5.png')
 
   }
   create() {
@@ -123,8 +129,14 @@ export default class Preloader extends Phaser.Scene {
         frames: this.anims.generateFrameNumbers("planet", { start: 0, end: 159 }),
         frameRate: 15, // 4 frames per second
         repeat: -1, // loop forever
-      })
+      });
+      this.anims.create({
+        key: "ship-engine",
+        frames: this.anims.generateFrameNumbers("fire_anim", { start: 0, end: 7 }),
+        frameRate: 15, // 4 frames per second
+        repeat: -1, // loop forever
+    });
 
-      this.scene.start("Level0"); //Start first level
+      this.scene.start("Level5"); //Start first level
   }
 }
