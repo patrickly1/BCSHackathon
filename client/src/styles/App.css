@@ -1,0 +1,27 @@
+/* Make the app container a flex container */
+.App {
+    display: flex;
+    flex-direction: row;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+  }
+  
+  /* The Phaser game container takes up the remaining space */
+  #phaser-container {
+    flex: 1;
+    /* Optionally add styling such as background, position, etc. */
+  }
+  
+  /* Terminal styles: fixed width, full height of the app, positioned on the right */
+  .terminal-overlay {
+    width: 300px; /* Set the desired terminal width */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Dark background */
+    color: #00FF00; /* Classic green text */
+    font-family: 'Courier New', Courier, monospace;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    /* Remove any full-screen fixed positioning */
+    position: relative;
+  }

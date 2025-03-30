@@ -1,0 +1,46 @@
+/* Terminal overlay covers the entire viewport */
+.terminal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Almost solid black */
+    color: #00FF00; /* Classic green text */
+    font-family: 'Courier New', Courier, monospace;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+  
+  /* Terminal output area for command history */
+  .terminal-output {
+    height: calc(100% - 50px); /* Leave space for the input */
+    overflow-y: auto;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+  }
+  
+  /* Terminal prompt styling */
+  .terminal-prompt {
+    margin-right: 5px;
+    color: #00FF00;
+  }
+  
+  /* Terminal input styling */
+  .terminal-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #00FF00;
+    font-family: inherit;
+    font-size: 16px;
+    caret-color: #00FF00; /* Set blinking cursor color */
+  }
+  
+  /* Optional: Style for each output line (if desired) */
+  .terminal-output > div {
+    margin-bottom: 4px;
+  }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-// import './Terminal.css'; // Add styles for the terminal overlay
+import '../styles/Terminal.css'; // Add styles for the terminal overlay
 
 function Terminal({ onSubmit }) {
   const [inputValue, setInputValue] = useState('');
@@ -25,7 +25,7 @@ function Terminal({ onSubmit }) {
       <div className="terminal-output">
         {/* Display command history or feedback here */}
         {history.map((line, index) => <div key={index}>{line}</div>)}
-        <div>Welcome to the Git Dungeon! Type your commands...</div>
+        <div>Welcome to the Gitopia! Type your commands...</div>
       </div>
       <form onSubmit={handleSubmit}>
         <span className="terminal-prompt"></span>
