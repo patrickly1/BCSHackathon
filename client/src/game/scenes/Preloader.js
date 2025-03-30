@@ -148,9 +148,11 @@ export default class Preloader extends Phaser.Scene {
     });
     this.musicManager = new MusicManager(this);
 
+
     if (!this.sound.get("bgm")) {
         this.musicManager.play("bgm");
     }
+
       this.scene.start("Level0"); //Start first level
   }
 }

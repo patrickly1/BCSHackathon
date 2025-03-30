@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import GameManager from "../GameManager";
 import PlayerController from "../PlayerController";
 
+
 const PLAYER_SPEED = 160;
 const REQUIRED_BRANCH_NAME = "mine";
 
@@ -173,7 +174,7 @@ export default class Level2 extends Phaser.Scene {
             const wallLayer = map.createLayer("Walls", tiles);
         });
 
-        this.setFeedback(`Move: WASD\nTerminal: T\nHint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
+        this.setFeedback(`Move: WASD\nOpen Terminal: T\nClose Terminal: ESC\nHint: Create a branch named '${REQUIRED_BRANCH_NAME}'`);
     }
 
     // --- *** ADD THIS METHOD *** ---

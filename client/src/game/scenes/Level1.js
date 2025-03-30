@@ -1,3 +1,4 @@
+// src/game/scenes/Level1.js
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
 import PlayerController from "../PlayerController";
@@ -71,7 +72,7 @@ export default class Level1 extends Phaser.Scene {
           .text(
               robotX,
               robotY - height * 0.2,
-              "Press T to open terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
+              "Hello Git Adventurer.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
               {
                   fontSize: "10px",
                   fill: "#00ffcc",
