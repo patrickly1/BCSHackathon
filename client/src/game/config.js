@@ -3,7 +3,7 @@ import Preloader from './scenes/Preloader';
 import Level1 from './scenes/Level1';
 import Level2 from './scenes/Level3';
 import Level3 from './scenes/Level2';
-// import Level4 from './scenes/Level4';
+import Level4 from './scenes/Level4';
 // import Level5 from './scenes/Level5';
 // import Level6 from './scenes/Level6';
 
@@ -25,7 +25,7 @@ export const config = {
     Level1,
     Level2,
     Level3,
-    // Level4,
+    Level4,
     // Level5,
     // Level6
     // Add other scenes as needed (e.g., MainMenu, GameOver)
