@@ -366,6 +366,7 @@ function App() {
   // Handle 'T' key press to toggle terminal
   useEffect(() => {
     const handleKeyDown = (event) => {
+        
       const activeElement = document.activeElement;
       // Check if focus is inside an input/textarea or inside the terminal overlay
       const isInputFocused = activeElement && 
@@ -545,7 +546,7 @@ function App() {
       {/* Main container: flex layout for game and terminal */}
       <div className="App">
         <div ref={phaserContainerRef} id="phaser-container"></div>
-        {isTerminalOpen && <Terminal onSubmit={handleCommandSubmit} />}
+        {isTerminalOpen && <Terminal onSubmit={handleCommandSubmit} onClose={() => setIsTerminalOpen(false)} />}
       </div>
     </div>
   );

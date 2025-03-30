@@ -47,25 +47,92 @@
 // export default Terminal;
 
 // src/components/Terminal.jsx
+// import React, { useState, useRef, useEffect } from 'react';
+
+// function Terminal({ onSubmit }) {
+//   const [command, setCommand] = useState('');
+//   const [history, setHistory] = useState([]);
+//   const terminalRef = useRef(null);
+
+//   // Auto-focus the terminal container on mount
+//   useEffect(() => {
+//     terminalRef.current?.focus();
+//   }, []);
+
+//   const handleKeyDown = (e) => {
+//     e.stopPropagation();
+//     // Close terminal when Escape is pressed
+//     if (e.key === 'Escape') {
+//         e.preventDefault();
+//         onClose();
+//         console.log("Esc");
+//         return;
+//     }
+//     if (e.key === 'Enter') {
+//       e.preventDefault();
+//       if (command.trim()) {
+//         // Send command to parent
+//         onSubmit(command.trim());
+//         // Append to history (prefixing with '> ')
+//         setHistory(prev => [...prev, `> ${command}`]);
+//         setCommand('');
+//       }
+//     } else if (e.key === 'Backspace') {
+//       setCommand(prev => prev.slice(0, -1));
+//     } else if (e.key.length === 1) {
+//       setCommand(prev => prev + e.key);
+//     }
+//   };
+
+//   return (
+//     <div 
+//       className="terminal-overlay" 
+//       tabIndex={0} 
+//       ref={terminalRef} 
+//       onKeyDown={handleKeyDown}
+//     >
+//       <div className="terminal-output">
+//         {history.map((line, index) => (
+//           <div key={index}>{line}</div>
+//         ))}
+//         <div>
+//           <span>{'> ' + command}</span>
+//           <span className="terminal-cursor" />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Terminal;
+
+// src/components/Terminal.jsx
 import React, { useState, useRef, useEffect } from 'react';
 
-function Terminal({ onSubmit }) {
+function Terminal({ onSubmit, onClose }) {
   const [command, setCommand] = useState('');
   const [history, setHistory] = useState([]);
   const terminalRef = useRef(null);
 
-  // Auto-focus the terminal container on mount
   useEffect(() => {
     terminalRef.current?.focus();
   }, []);
 
   const handleKeyDown = (e) => {
+    // Prevent key events from propagating to the game
+    e.stopPropagation();
+
+    // If Escape is pressed, close the terminal
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose(); // This calls the onClose callback passed from App.jsx
+      return;
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
       if (command.trim()) {
-        // Send command to parent
         onSubmit(command.trim());
-        // Append to history (prefixing with '> ')
         setHistory(prev => [...prev, `> ${command}`]);
         setCommand('');
       }
