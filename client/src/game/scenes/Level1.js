@@ -113,6 +113,13 @@ export default class Level1 extends Phaser.Scene {
       this.events.on("shutdown", () => {
           this.game.events.off("commandInput", this.handleCommand, this);
       });
+          if (!this.sound.get("bgm")) {
+              const bgm = this.sound.add("bgm", {
+                  loop: true,
+                  volume: 0.5,
+              });
+              bgm.play();
+          }
   }
 
   handleCommand(command) {

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import GameManager from '../GameManager';
+import MusicManager from "../MusicManager";
 
 // uses GameManager to load in a specific level.
 
@@ -55,6 +56,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('sword_hilt', 'assets/sword_hilt.png');
     this.load.image('gem', 'assets/gem.png');
     this.load.image('anvil', 'assets/anvil.png');
+    //load music
+    this.load.audio("bgm", "assets/modern_bits.ogg");
     // this.load.image('shield', 'assets/shield.png');
     // this.load.image('map', 'assets/map.png');
     //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
@@ -143,7 +146,11 @@ export default class Preloader extends Phaser.Scene {
         frameRate: 15, // 4 frames per second
         repeat: -1, // loop forever
     });
+    this.musicManager = new MusicManager(this);
 
-      this.scene.start("Level4"); //Start first level
+    if (!this.sound.get("bgm")) {
+        this.musicManager.play("bgm");
+    }
+      this.scene.start("Level0"); //Start first level
   }
 }
