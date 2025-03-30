@@ -15,6 +15,7 @@
     "express": "^4.21.2",
     "mongoose": "^8.13.1",
     "phaser": "^3.88.2",
+    "phaser3-rex-plugins": "^1.80.14",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

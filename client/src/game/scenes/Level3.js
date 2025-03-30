@@ -490,7 +490,7 @@ export default class Level3 extends Phaser.Scene {
       return;
     }
 
-    this.setFeedback('Unknown command. Try: git add <resource>, git commit -m "Collected resources", or git checkout base.');
+    this.setFeedback('Unknown command. Try: git add <resource>,\n git commit -m "Collected resources",\n or git checkout base.');
   }
 
   setFeedback(message) {
