@@ -33,6 +33,10 @@ export default class Level4 extends Phaser.Scene {
     this.load.tilemapTiledJSON("levelFourMap", 'assets/level/base/base.tmj');
 
     this.robotSound = this.sound.add("robot");
+    this.spawnShipSound = this.sound.add("spawn-ship");
+    this.shipTakeoff = this.sound.add("ship-sounds");
+    this.alarmSound = this.sound.add("alarm");
+
   }
 
   create() {
@@ -255,6 +259,7 @@ export default class Level4 extends Phaser.Scene {
         if (!this.mergeAttempted) {
           this.mergeAttempted = true;
           this.startFlashingBackground();
+          this.alarmSound.play();
           this.setFeedback("Merge conflict error! Please run git reset to resolve conflicts.");
           this.instructionText.setText("Computer malfunctioned! Reset the changes!");
         } else {
@@ -274,10 +279,12 @@ export default class Level4 extends Phaser.Scene {
             if (!this.resetDone) {
             this.resetDone = true;
             this.stopFlashingBackground();
+            this.alarmSound.stop();
             // Create a portal sprite at launch area, then replace it with the spaceship image
             this.portal = this.physics.add.sprite(width * 0.5, height * 0.2, "portal").setScale(1.5);
             if (this.portal.anims) {
                 this.portal.anims.play("portal-effect");
+                this.spawnShipSound.play();
             }
             this.portal.setOrigin(0.5);
             this.time.delayedCall(1500, () => {
@@ -302,8 +309,9 @@ export default class Level4 extends Phaser.Scene {
           return;
         }
         this.setFeedback("Mission accomplished! Your changes have been pushed. Game Over.");
+        this.shipTakeoff.play();
         this.time.delayedCall(500, () => {
-          this.scene.start('Level5');
+            this.scene.start('Level5');
         });
         return;
       }
@@ -320,7 +328,7 @@ export default class Level4 extends Phaser.Scene {
   startFlashingBackground() {
     if (this.flashEvent) return;
     this.flashEvent = this.time.addEvent({
-      delay: 2000,
+      delay: 500,
       loop: true,
       callback: () => {
         if (!this.alertOverlay) return;
