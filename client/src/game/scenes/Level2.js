@@ -19,6 +19,9 @@ export default class Level2 extends Phaser.Scene {
         // Game logic state
         // this.inventory = new Set(); // Items the player has picked up
 
+        // Flag for robot interaction
+        this.robotInteracted = false;
+
         this.stagedItems = new Set(); // Items successfully 'git add'-ed
     }
 
@@ -52,7 +55,7 @@ export default class Level2 extends Phaser.Scene {
         this.robotInstruction = this.add
             .text(
                 robotX,
-                robotY - height * 0.3,
+                robotY - height * 0.25,
                 "Our spaceship is down—we need to reach a mine to collect resources for repairs!\n\nTo avoid breaking the main project, we create a new branch using 'git branch <name>'.\n\nWe use 'git checkout <name>' to switch into that branch and start working.\n\nTry it now to explore the mine without affecting main progress.",
                 {
                     fontSize: "10px",
@@ -80,6 +83,17 @@ export default class Level2 extends Phaser.Scene {
         this.robot = this.physics.add.sprite(robotX, robotY, "robot").setScale(1.5);
         this.robot.anims.play("robot-idle");
         this.robot.setOrigin(0.5); // Center the sprite's origin (optional)
+
+        this.robotAlert = this.add
+            .text(robotX, robotY - 25, "!", {
+                fontSize: "20px",
+                fontFamily: "Minecraft",
+                color: "#ff0000",
+                stroke: "#000000",
+                strokeThickness: 3,
+            })
+            .setOrigin(0.5);
+
         // ... other setup ...
         this.cameras.main.setBackgroundColor("#2c3e50");
 
@@ -187,21 +201,26 @@ export default class Level2 extends Phaser.Scene {
     update(time, delta) {
         if (!this.input.keyboard.enabled) return;
         this.playerController.update();
-    
+
         // Check distance between the player and the robot
         if (this.robot && this.robotInstruction) {
-            const distance = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                this.robot.x, this.robot.y
-            );
-            const threshold = 50; // Adjust this value as needed
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.robot.x, this.robot.y);
+            const threshold = 50; // Adjust as needed
             this.robotInstruction.setVisible(distance < threshold);
+
+            if (this.robotAlert && !this.robotInteracted) {
+                this.robotAlert.setVisible(distance >= threshold);
+            }
+
+            if (distance < threshold && !this.robotInteracted) {
+                this.robotInteracted = true;
+            }
         }
 
         if (!this.input.keyboard.enabled) return;
-            this.playerController.update();
-            this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
-            this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
+        this.playerController.update();
+        this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
+        this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
     }
 
     collectItem(playerSprite, item) {
