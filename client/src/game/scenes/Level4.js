@@ -187,7 +187,7 @@ export default class Level4 extends Phaser.Scene {
         this.robotInteracted = true;
         this.robotSound.play();
     }
-    }}
+    }
   
     // In update() method, add this after your existing update logic:
     if (this.resetDone && !this.hasBoarded && this.player) {
@@ -203,7 +203,7 @@ export default class Level4 extends Phaser.Scene {
         }
     }
     // Removed automatic spaceship boarding from update()
-  }
+}
 
 
   handleCommand(command) {
