@@ -101,6 +101,30 @@ export default class Level2 extends Phaser.Scene {
         this.player = this.physics.add.sprite(width * 0.5, height * 0.5, "player").setScale(2.5);
         this.player.setCollideWorldBounds(true);
 
+        // Add Ship Collision
+        const squareOne = this.add.rectangle(240, 320, 100, 100, 0xff0000, 0);
+        const squareTwo = this.add.rectangle(200, 320, 50, 50, 0xff0000, 0);
+        const squareThree = this.add.rectangle(190, 330, 50, 50, 0xff0000, 0);
+        const squareFour = this.add.rectangle(180, 340, 50, 50, 0xff0000, 0);
+        const squareFive = this.add.rectangle(170, 350, 50, 50, 0xff0000, 0);
+        const squareSix = this.add.rectangle(300, 250, 50, 50, 0xff0000, 0);
+
+
+
+        this.physics.add.existing(squareOne, true); 
+        this.physics.add.collider(this.player, squareOne);
+        this.physics.add.existing(squareTwo, true);
+        this.physics.add.collider(this.player, squareTwo);
+        this.physics.add.existing(squareThree, true);
+        this.physics.add.collider(this.player, squareThree);
+        this.physics.add.existing(squareFour, true);
+        this.physics.add.collider(this.player, squareFour);
+        this.physics.add.existing(squareFive, true);
+        this.physics.add.collider(this.player, squareFive);
+        this.physics.add.existing(squareSix, true);
+        this.physics.add.collider(this.player, squareSix);
+
+
         // --- Input ---
         // Still add keys so they are ready when input is enabled
         this.keys = this.input.keyboard.addKeys("W,A,S,D");
@@ -175,6 +199,11 @@ export default class Level2 extends Phaser.Scene {
             const threshold = 50; // Adjust this value as needed
             this.robotInstruction.setVisible(distance < threshold);
         }
+
+        if (!this.input.keyboard.enabled) return;
+            this.playerController.update();
+            this.player.x = Phaser.Math.Clamp(this.player.x, 30, 450);
+            this.player.y = Phaser.Math.Clamp(this.player.y, 240, 450);
     }
 
     collectItem(playerSprite, item) {
