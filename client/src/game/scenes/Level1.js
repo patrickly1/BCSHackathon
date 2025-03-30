@@ -51,7 +51,7 @@ export default class Level1 extends Phaser.Scene {
           .text(
               robotX,
               robotY - height * 0.3,
-              "Press T to open terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
+              "Press T to open terminal.\n\nPres ESC to close terminal.\n\nYou’re drifting through a hostile void. \nYour only hope? A faint signal from a forgotten project. \n\nTo pull its last commit into memory…\n\n-> Type 'git clone gitopia'",
               {
                   fontSize: "10px",
                   fill: "#00ffcc",
