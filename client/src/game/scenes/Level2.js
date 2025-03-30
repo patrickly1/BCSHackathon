@@ -30,14 +30,7 @@ export default class Level2 extends Phaser.Scene {
     create() {
 
         const player = GameManager.getPlayer();
-
-        const { width, height } = this.scale;
-        const centerX = width / 2;
-
-        const robotX = width * 0.5;
-        const robotY = width * 0.7;
-      
-       if (player.getLocation() !== 'Level2') {
+        if (player.getLocation() !== 'Level2') {
             player.setLocation('Level2');
             }
 
@@ -45,6 +38,13 @@ export default class Level2 extends Phaser.Scene {
         if (this.game.reactSetCurrentLocation) {
             this.game.reactSetCurrentLocation('Level2');
         }
+
+        const { width, height } = this.scale;
+        const centerX = width / 2;
+
+        const robotX = width * 0.5;
+        const robotY = width * 0.7;
+    
 
         this.robotInstruction = this.add
             .text(

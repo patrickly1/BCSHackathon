@@ -22,6 +22,15 @@ export default class Level4 extends Phaser.Scene {
   }
 
   create() {
+    const player = GameManager.getPlayer();
+        if (player.getLocation() !== 'Level4') {
+            player.setLocation('Level4');
+            }
+
+        // Update the location in the App (React side)
+        if (this.game.reactSetCurrentLocation) {
+            this.game.reactSetCurrentLocation('Level4');
+        }
     const { width, height } = this.scale;
     const centerX = width / 2;
 
