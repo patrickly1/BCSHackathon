@@ -1,3 +1,7 @@
+# Live Demo
+
+http://gitopia.netlify.app
+
 # About
 ## Inspiration
 
@@ -67,3 +71,29 @@ npm run dev
 cd client
 npm run dev
 ```
+
+# Preview
+
+![Welcome to Gitopia](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/519/datas/gallery.jpg)\
+*Welcome to Gitopia!*
+
+
+![Branch 1: Space](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/526/datas/gallery.jpg)\
+*Branch 1: Space*
+
+
+![Branch 2: Gitopia](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/709/datas/gallery.jpg)\
+*Branch 2: Gitopia*
+
+![Branch 3: The Mine](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/554/datas/gallery.jpg)\
+*Branch 3: The Mine*
+
+
+![Branch 4: The Base](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/568/datas/gallery.jpg)\
+*Branch 4: The Base*
+
+
+![Branch 5: Victory](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/576/datas/gallery.jpg)\
+*Branch 5: Victory*\
+
+
