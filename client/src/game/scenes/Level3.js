@@ -33,7 +33,6 @@ export default class Level3 extends Phaser.Scene {
         const map = this.add.tilemap("levelThreeMap");
         const mainTiles = map.addTilesetImage("MainLev2.0", "mainTiles")
         const decorativeTiles = map.addTilesetImage("decorative", "decorativeTiles")
-        const backBackgroundLayer = map.createLayer("BackBackground", mainTiles)
         const backgroundLayer = map.createLayer("Background", mainTiles)
         const floorLayer = map.createLayer("Floor", mainTiles)
         const obstacleLayer = map.createLayer("Obstacles", decorativeTiles)
