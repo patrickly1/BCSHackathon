@@ -366,16 +366,16 @@ function App() {
     };
   }, []);
 
-//   function getOrCreateUserId() {
-//     const stored = localStorage.getItem('userId');
-//     if (stored) return stored;
+  function getOrCreateUserId() {
+    const stored = localStorage.getItem('userId');
+    if (stored) return stored;
   
-//     const newId = crypto.randomUUID();
-//     localStorage.setItem('userId', newId);
-//     return newId;
-//   }
+    const newId = crypto.randomUUID();
+    localStorage.setItem('userId', newId);
+    return newId;
+  }
 
-//   const [userId] = useState(getOrCreateUserId());
+  const [userId] = useState(getOrCreateUserId());
 
 
 
@@ -430,11 +430,12 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: saveName,
-          timeElapsed,
-          currentLocation: GameManager.getPlayer().getLocation(),
-          inventory: GameManager.getPlayer().inventory
-        }),
+            userId,
+            username: saveName,
+            timeElapsed,
+            currentLocation: GameManager.getPlayer().getLocation(),
+            inventory: GameManager.getPlayer().inventory
+          }),
       });
       const data = await res.json();
       console.log('✅ Save response:', data);
@@ -451,29 +452,12 @@ function App() {
 
   const handleLoad = async () => {
     try {
-      const listRes = await fetch('http://localhost:5001/api/save');
-      const usernames = await listRes.json();
-      if (!Array.isArray(usernames) || usernames.length === 0) {
-        alert('No save files found.');
-        return;
-      }
-      const selected = prompt(`Which file do you want to load?\n\n${usernames.join('\n')}`);
-      if (!selected) {
-        alert('Invalid or cancelled selection.');
-        return;
-      }
-      const matchedUsername = usernames.find(
-        (name) => name.toLowerCase() === selected.toLowerCase()
-      );
-      if (!matchedUsername) {
-        alert('No matching save file found.');
-        return;
-      }
-      const res = await fetch(`http://localhost:5001/api/save/${selected}`);
+      
+      const res = await fetch(`http://localhost:5001/api/save/${userId}`);
       const data = await res.json();
       console.log('📦 Loaded save:', data);
-      setUsername(selected);
-      setTimeElapsed(data.timeElapsed);
+      setUsername(data.username);
+      setTimeElapsed(Number(data.timeElapsed) || 0);
       setCurrentLocation(data.currentLocation);
       setTimerActive(true);
   
