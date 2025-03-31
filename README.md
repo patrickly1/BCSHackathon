@@ -94,6 +94,17 @@ npm run dev
 
 
 ![Branch 5: Victory](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/350/576/datas/gallery.jpg)\
-*Branch 5: Victory*\
+*Branch 5: Victory*
 
-
+# Assets
+- https://deep-fold.itch.io/space-background-generator
+- https://frostwindz.itch.io/pixel-art-fantasy-animated-portal
+- https://brullov.itch.io/fire-animation
+- https://ragnapixel.itch.io/particle-fx
+- https://norma-2d.itch.io/space-backgrounds-pack
+- https://beast-pixels.itch.io/crafting-materials
+- https://szadiart.itch.io/rpg-worlds-ca
+- https://trevor-pupkin.itch.io/tech-dungeon-roguelite
+- https://norma-2d.itch.io/celestial-objects-pixel-art-pack?download
+- https://deep-fold.itch.io/pixel-planet-generator
+- https://dizabanik.itch.io/pixelastronaut
